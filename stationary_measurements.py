@@ -160,14 +160,43 @@ def get_thrust_coefficient(height, thrust, rps):
 
     return thrust/(density*np.power(rps, 2)*cessna.D)
 
-def plot_reduced_elevator_trim_curve(weight, height, thrust, rps, v_t, de_measured, alpha_measured, delta_cg, tc):
+def plot_reduced_elevator_trim_curve(weight, height, thrust, rps, v_t, de_measured, alpha_measured, delta_cg, t_cs):
+    """
+
+    :param weight:
+    :param height:
+    :param thrust:
+    :param rps: Revolutions per second
+    :param v_t: True airspeed
+    :param de_measured: Measured elevator deflection
+    :param alpha_measured: Measured angle of attack
+    :param delta_cg: Change in center of gravity
+    :param t_cs: Standard thrust coefficient
+    :return:
+    """
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
 
     delta_de = np.diff(de_measured)
     delta_alpha = np.diff(alpha_measured)
-    t_cs = get_thrust_coefficient(height, thrust, rps)
+    t_c = get_thrust_coefficient(height, thrust, rps)
 
     _, cm_delta = get_cm_derivatives(weight, height, v_t, delta_cg, delta_de,delta_alpha)
-    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, tc)
+    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c)
 
     plt.plot(reduced_velocity, reduced_elevator_deflection)
+    plt.show()
+
+def plot_elevator_force_control_curve(weight, height, v_t, f_e):
+    """
+
+    :param weight:
+    :param height:
+    :param v_t:
+    :param f_e: Stick force
+    :return:
+    """
+    reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
+    reduced_force = f_e*weight/cessna.W
+
+    plt.plot(reduced_velocity, reduced_force)
+    plt.show()
