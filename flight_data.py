@@ -52,3 +52,4 @@ dadc1_alt_rate        = np.array(input_file['flightdata'][0][0][42][0][0][0])  #
 # display_graph_state   = np.array(input_file['flightdata'][0][0][45][0][0][0])  # Status of graph, -
 # display_active_screen = np.array(input_file['flightdata'][0][0][46][0][0][0])  # Active screen, -
 # time                  = np.array(input_file['flightdata'][0][0][47][0][0][0])  # Time, sec
+totalfuelflow = lh_engine_fmf+rh_engine_fmf
