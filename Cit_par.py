@@ -112,4 +112,7 @@ Cnda = -0.0120
 Cndr = -0.0939
 
 #Pitch moment derivatives
-Cm_tc = -0.0064
+Cm_tc = -0.0064 # TODO gotta check this.just taken this form document
+
+#Engine characteristic diameter
+D = 0.5 #random value TODO think about that

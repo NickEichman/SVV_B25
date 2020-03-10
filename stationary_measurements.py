@@ -146,14 +146,26 @@ def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
     """
     return de_measured* -1/cm_delta*cessna.Cm_tc*(t_cs-t_c)
 
-def get_thrust_coefficent():
+def get_thrust_coefficient(height, thrust, rps):
+    """
 
+    :param height:
+    :param thrust:
+    :param rps: Revolutions per second
+    :return: Thrust coefficient
+    """
+    temperature = isa.get_t_at_height(height)
+    pressure = isa.get_p_at_temperature(temperature)
+    density = isa.get_rho(pressure, temperature)
 
-def plot_reduced_elevator_trim_curve(weight, height, v_t, de_measured, alpha_measured, delta_cg):
+    return thrust/(density*np.power(rps, 2)*cessna.D)
+
+def plot_reduced_elevator_trim_curve(weight, height, thrust, rps, v_t, de_measured, alpha_measured, delta_cg, tc):
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
 
     delta_de = np.diff(de_measured)
     delta_alpha = np.diff(alpha_measured)
+    t_cs = get_thrust_coefficient(height, thrust, rps)
 
     _, cm_delta = get_cm_derivatives(weight, height, v_t, delta_cg, delta_de,delta_alpha)
     reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, tc)
