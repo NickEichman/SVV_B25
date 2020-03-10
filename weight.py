@@ -21,8 +21,7 @@ mass_seat8 =1
 mass_seat9 =1
 mass_seat10 =1
 payloadmass = mass_seat1+mass_seat2+mass_seat3+mass_seat4+mass_seat5+mass_seat6+mass_seat7+mass_seat8+mass_seat10+mass_seat9+nosebaggagemass+aftcabinmass+aftcabinmass2
-#mass calculations
-ramp_mass = bem + fuel_mass[-1] +mass_baggage+mass_cargo+mass_seat1+mass_seat2+mass_seat3+mass_seat4+mass_seat5+mass_seat6+mass_seat7+mass_seat8+mass_seat9+mass_seat10
+ramp_mass = bem + fuel_mass[-1] +payloadmass
 
 #xcgdatum and xcg function calculations
 #xcg positions of all components [INCHES]
@@ -83,5 +82,4 @@ def trapezodial(x,y):
             xcg.append(cmtotal[-1] / weights[-1])
     return area,areaq1,weights, cmtotal, xcg
 
-#weight = ramp_mass - trapezodial(totalfuelflow, time)
-#weight = ramp_mass - (fuel_mass[-1]-fuel_mass[-2])
+
