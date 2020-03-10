@@ -111,17 +111,5 @@ Cnr = -0.2061
 Cnda = -0.0120
 Cndr = -0.0939
 
-    © 2020 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
-
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
+#Pitch moment derivatives
+Cm_tc = -0.0064

@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.optimize as opt
+import matplotlib.pyplot as plt
 
 import Cit_par as cessna
 import isa
@@ -134,5 +135,27 @@ def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
 
     return cm_alpha, cm_delta
 
+def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
+    """
+
+    :param de_measured: Measured elevator deflection
+    :param cm_delta:
+    :param t_cs: Dimensionless standard thrust coefficient, for value look at Appendix F
+    :param t_c: thrust coefficient
+    :return: Reduced elevator deflection
+    """
+    return de_measured* -1/cm_delta*cessna.Cm_tc*(t_cs-t_c)
+
+def get_thrust_coefficent():
 
 
+def plot_reduced_elevator_trim_curve(weight, height, v_t, de_measured, alpha_measured, delta_cg):
+    reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
+
+    delta_de = np.diff(de_measured)
+    delta_alpha = np.diff(alpha_measured)
+
+    _, cm_delta = get_cm_derivatives(weight, height, v_t, delta_cg, delta_de,delta_alpha)
+    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, tc)
+
+    plt.plot(reduced_velocity, reduced_elevator_deflection)
