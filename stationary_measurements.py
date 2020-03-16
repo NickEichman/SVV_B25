@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 import Cit_par as cessna
 import isa
-
+import subprocess
 
 def cl_curve(alpha, cn_alpha, alpha_0):
     return cn_alpha * alpha - cn_alpha * alpha_0
@@ -146,7 +146,7 @@ def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
     """
     return de_measured* -1/cm_delta*cessna.Cm_tc*(t_cs-t_c)
 
-def get_thrust_coefficient(height, thrust, rps):
+def get_thrust_coefficient(height, thrust, velocity):
     """
 
     :param height:
@@ -158,30 +158,31 @@ def get_thrust_coefficient(height, thrust, rps):
     pressure = isa.get_p_at_temperature(temperature)
     density = isa.get_rho(pressure, temperature)
 
-    return thrust/(density*np.power(rps, 2)*cessna.D)
+    return thrust/(density*np.power(velocity,2)*np.power(cessna.D,2))
 
-def plot_reduced_elevator_trim_curve(weight, height, thrust, rps, v_t, de_measured, alpha_measured, delta_cg, t_cs):
+def plot_reduced_elevator_trim_curve(weight, height, thrust, thrust_from_exe, v_t, de_measured_cg, alpha_measured_cg, de_measured_trim,delta_cg):
     """
 
     :param weight:
     :param height:
     :param thrust:
-    :param rps: Revolutions per second
     :param v_t: True airspeed
-    :param de_measured: Measured elevator deflection
-    :param alpha_measured: Measured angle of attack
+    :param de_measured_cg: Measured elevator deflection from experiment with change of cg
+    :param de_measured_trim: Measured elevator deflection from experiment with 7 data points
+    :param alpha_measured_cg: Measured angle of attack
     :param delta_cg: Change in center of gravity
-    :param t_cs: Standard thrust coefficient
     :return:
     """
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
 
-    delta_de = np.diff(de_measured)
-    delta_alpha = np.diff(alpha_measured)
-    t_c = get_thrust_coefficient(height, thrust, rps)
+    delta_de = np.diff(de_measured_cg)
+    delta_alpha = np.diff(alpha_measured_cg)
+    t_cs = get_thrust_coefficient(height, thrust_from_exe, reduced_velocity)
+    t_c = get_thrust_coefficient(height, thrust, v_t)
 
     _, cm_delta = get_cm_derivatives(weight, height, v_t, delta_cg, delta_de,delta_alpha)
-    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c)
+    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured_trim, cm_delta, t_cs, t_c)
+
 
     plt.plot(reduced_velocity, reduced_elevator_deflection)
     plt.show()
@@ -200,3 +201,17 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
 
     plt.plot(reduced_velocity, reduced_force)
     plt.show()
+
+
+def run_thrust_exe(height, calibrated_airspeed, fuel_flow_left, fuel_flow_right, measured_temperature):
+    mach_number = get_mach_number(height, calibrated_airspeed)
+    temperature_delta = measured_temperature - isa.get_t_at_height(height)
+    matlab_data = np.vstack([height, mach_number, fuel_flow_left, fuel_flow_right, temperature_delta]).T
+    np.savetxt("matlab.dat", matlab_data, delimiter=" ")
+    subprocess.call("thrust.exe")
+    thrust = np.genfromtxt("thrust.dat")[:,0]*2 #per engine, therfore x2
+    return thrust
+
+def get_thrust_from_thrust_dat():
+    thrust = np.genfromtxt("thrust.dat")[:, 0] * 2  # per engine, therfore x2
+    return thrust
