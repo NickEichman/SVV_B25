@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import Cit_par as cessna
 import isa
 import subprocess
+import stationary_flight_data as flight_data
 
 def cl_curve(alpha, cn_alpha, alpha_0):
     return cn_alpha * alpha - cn_alpha * alpha_0
@@ -22,7 +23,7 @@ def get_cl_params(alpha, weight, height, true_airspeed):
     :param weight:
     :param height:
     :param true_airspeed:
-    :return: cn_alpha, alpha_0
+    :return: cn_alpha, alpha_0, cn from flight
     """
 
     temperature = isa.get_t_at_height(height)
@@ -33,7 +34,7 @@ def get_cl_params(alpha, weight, height, true_airspeed):
     popt, _ = opt.curve_fit(cl_curve, alpha, cn)
     cn_alpha, alpha_0 = popt
 
-    return cn_alpha, alpha_0
+    return cn_alpha, alpha_0, cn
 
 
 def get_cd_params(alpha, weight, height, true_airspeed, thrust):
@@ -45,20 +46,20 @@ def get_cd_params(alpha, weight, height, true_airspeed, thrust):
     :param height:
     :param true_airspeed:
     :param thrust:
-    :return: cd_0, e
+    :return: cd_0, e, cd from flight
     """
     temperature = isa.get_t_at_height(height)
     pressure = isa.get_p_at_temperature(temperature)
     density = isa.get_rho(pressure, temperature)
 
-    cn_alpha, alpha_0 = get_cl_params(alpha, weight, height, true_airspeed)
+    cn_alpha, alpha_0, _ = get_cl_params(alpha, weight, height, true_airspeed)
 
     cl = cn_alpha * (alpha - alpha_0)
     cd = thrust / (0.5 * density * np.power(true_airspeed, 2) * cessna.S)
 
     popt, _ = opt.curve_fit(cd_curve, cl, cd)
     cd_0, e = popt
-    return cd_0, e
+    return cd_0, e, cd
 
 
 def get_mach_number(height, v_c):
@@ -229,3 +230,8 @@ def get_thrust_from_thrust_dat():
     thrust = np.genfromtxt("thrust.dat")[:, 0] * 2  # per engine, therfore x2
     return thrust
 
+true_airspeed = get_true_airspeed(flight_data.sm1_alt, flight_data.sm1_temp, flight_data.sm1_IAS)
+cl_alpha, alpha_0, cn = get_cl_params(flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt,true_airspeed)
+sm1_thrust =np.array([7259.3,  6334.22, 4817.2,  3784.28, 3602.42, 4594.08]) #TODO CHANGE WHEN DATA IS CHANGED
+
+cd_0, e, cd = get_cd_params(flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt, true_airspeed, sm1_thrust)

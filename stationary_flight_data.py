@@ -1,7 +1,8 @@
 import numpy as np
 
+takeoff_mass = 14852*0.453592                                       # [kg]
 masses = np.array([80,102,76,74,58,89,71,110,87])                   # [kg]
-
+g = 9.81
 # Stationary Measurements 1
 
 sm1_time = np.array([1436,1533,1678,2015,2264,2338])                # [s]
@@ -10,8 +11,10 @@ sm1_IAS = np.array([238,224,188,158,125,117])*0.514444              # [m/s]
 sm1_alpha = np.array([1.9,2.2,3.9,5.7,10,11.7])*np.pi/180           # [rad]
 sm1_FFl = np.array([673,589,458,373,343,397])*0.453592/(3600)       # [kg/s]
 sm1_FFr = np.array([719,633,498,404,369,427])*0.453592/(3600)       # [kg/s]
-sm1_F_used = np.array([517,546,584,661,712,727])*0.453592/(3600)    # [kg/s]
+sm1_F_used = np.array([517,546,584,661,712,727])*0.453592           # [kg/s]
 sm1_temp = np.array([-8.2,-11.5,-14.2,-17.5,-19.8,-20.2])+273.15    # [K]
+sm1_weight = (takeoff_mass - sm1_F_used) * g
+
 
 
 # Stationary Measurements 2
@@ -25,8 +28,9 @@ sm2_delta_tr = np.array([-2.9,-2.9,-2.9,-2.9,-2.9,-2.9,-2.9])*np.pi/180 # [rad]
 sm2_Fe = np.array([0,-19,-29,-38,32,49,88])                             # [N]
 sm2_FFl = np.array([402,399,392,390,411,415,427])*0.453592/(3600)       # [kg/s]
 sm2_FFr = np.array([430,430,422,424,444,449,462])*0.453592/(3600)       # [kg/s]
-sm2_F_used = np.array([787,809,823,837,868,881,900])*0.453592/(3600)    # [kg/s]
+sm2_F_used = np.array([787,809,823,837,868,881,900])*0.453592           # [kg/s]
 sm2_temp = np.array([-18.2,-18.8,-19.5,-20.8,-17.8,-16.5,-15.5])+273.15 # [K]
+sm2_weight = (takeoff_mass - sm2_F_used) * g
 
 # Stationary Measurements 3
 
@@ -39,6 +43,7 @@ sm3_delta_tr = np.array([-2.8,-2.8])*np.pi/180                          # [rad]
 sm3_Fe = np.array([0,-30])                                              # [N]
 sm3_FFl = np.array([417,414])*0.453592/(3600)                           # [kg/s]
 sm3_FFr = np.array([452,450])*0.453592/(3600)                           # [kg/s]
-sm3_F_used = np.array([975,979])*0.453592/(3600)                        # [kg/s]
+sm3_F_used = np.array([975,979])*0.453592                               # [kg/s]
 sm3_temp = np.array([-17.5,-17.2])+273.15                               # [K]
+sm3_weight = (takeoff_mass - sm3_F_used) * g
 
