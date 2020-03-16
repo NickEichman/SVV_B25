@@ -204,6 +204,15 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
 
 
 def run_thrust_exe(height, calibrated_airspeed, fuel_flow_left, fuel_flow_right, measured_temperature):
+    """[summary]
+    
+    :param height: from stationary measurements 
+    :param calibrated_airspeed: from stationary measurements 
+    :param fuel_flow_left: from stationary measurements 
+    :param fuel_flow_right: from stationary measurements 
+    :param measured_temperature: from stationary measurements 
+    :return: array of thrust values for both engines for each stationary measurement from thrust.exe program 
+    """    
     mach_number = get_mach_number(height, calibrated_airspeed)
     temperature_delta = measured_temperature - isa.get_t_at_height(height)
     matlab_data = np.vstack([height, mach_number, fuel_flow_left, fuel_flow_right, temperature_delta]).T
@@ -213,5 +222,10 @@ def run_thrust_exe(height, calibrated_airspeed, fuel_flow_left, fuel_flow_right,
     return thrust
 
 def get_thrust_from_thrust_dat():
+    """[summary]
+    
+    :return: array of thrust values for both engines for each stationary measurement read from .dat file
+    """    
     thrust = np.genfromtxt("thrust.dat")[:, 0] * 2  # per engine, therfore x2
     return thrust
+
