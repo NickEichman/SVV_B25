@@ -1,13 +1,13 @@
 import numpy as np
-import math
 
 #PHYSICAL CONSTANTS, SI UNITS
 T_0 = 288.15
 alpha = -6.5e-3
 R = 287
-P_0 = 101325
+p_0 = 101325
 gamma = 1.4
 g = 9.80665
+rho_0 = 1.225
 
 def get_rho(p, t, R=R):
     """
@@ -31,7 +31,7 @@ def get_t_at_height(h, alpha=alpha, T_0=T_0):
     """
     return T_0 + alpha*h
 
-def get_p_at_temperature(t, P_0=P_0, T_0=T_0, g=g, alpha=alpha, R=R):
+def get_p_at_temperature(t, P_0=p_0, T_0=T_0, g=g, alpha=alpha, R=R):
     """
     Calculates pressure for given temperature, valid for stratosphere only
 
@@ -54,9 +54,9 @@ def get_speed_of_sound(t, gamma=gamma, R=R):
     :param R: Gas constant of the air
     :return: Speed of sound at temperature T[K]
     """
-    return math.sqrt(gamma*R*t)
+    return np.sqrt(gamma*R*t)
 
-def get_h_at_pressure(p, T_0=T_0, P_0=P_0, alpha=alpha, g=g, R=R):
+def get_h_at_pressure(p, T_0=T_0, P_0=p_0, alpha=alpha, g=g, R=R):
     """
     Calculates height for given pressure, valid for stratosphere only
 

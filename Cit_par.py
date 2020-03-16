@@ -111,17 +111,8 @@ Cnr = -0.2061
 Cnda = -0.0120
 Cndr = -0.0939
 
-    © 2020 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
+#Pitch moment derivatives
+Cm_tc = -0.0064 # TODO gotta check this.just taken this form document
 
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
+#Engine characteristic diameter
+D = 0.5 #random value TODO think about that
