@@ -65,7 +65,7 @@ def fuel_to_cg(fuel_used):
         current_weight = ramp_mass - fuel_used[i]
         currentcmfuel = np.interp(current_fuel, fuel_mass, Cmfuel)
         cmtotal.append(
-            Cmramp + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose + cmfuelcurrent)  # Current aircraft Cm)
+            Cmramp + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose + currentcmfuel)  # Current aircraft Cm)
         xcg.append(cmtotal[i] / current_weight)
     return np.array(xcg)
 
