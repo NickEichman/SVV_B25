@@ -21,6 +21,7 @@ mass_seat8 =105
 mass_seat10 =76
 payloadmass = mass_seat1+mass_seat2+mass_seat3+mass_seat4+mass_seat5+mass_seat6+mass_seat7+mass_seat8+mass_seat10+nosebaggagemass+aftcabinmass+aftcabinmass2
 ramp_mass = 14852 * 0.453592
+m_fuel = 4100 * 0.453592
 
 #xcgdatum and xcg function calculations
 #xcg positions of all components [INCHES]
@@ -36,10 +37,10 @@ seat10 = 170 * 0.0254
 nosebaggage = 93.7 * 0.0254 #meters
 aftcabbaggage =0
 aftcabbaggage2 =0
-bemcg =292.18 * 0.0254
-payloadcg =0
+bemcg = 292.18 * 0.0254
+payloadcg = 0
 wingcg = 315.5 * 0.0254
-zfmcg =280.4 * 0.0254
+zfmcg = 280.4 * 0.0254
 rampmasscg = 281.76 * 0.0254
 
 #moments of all components
@@ -60,8 +61,8 @@ Cmnose = nosebaggagemass * nosebaggage
 def fuel_to_cg(fuel_used):
     cmtotal = []
     xcg = []
-    for i in fuel_used:
-        current_fuel = 4000 - fuel_used[i]
+    for i in range(len(fuel_used)):
+        current_fuel = m_fuel - fuel_used[i]
         current_weight = ramp_mass - fuel_used[i]
         currentcmfuel = np.interp(current_fuel, fuel_mass, Cmfuel)
         cmtotal.append(
