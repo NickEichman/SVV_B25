@@ -3,7 +3,7 @@ import numpy as np
 #Give in meters, 1 inch = 0.0254 m, 1 inchpound = 0.113 Nm, 1 pound = 0.453592 kg
 bem = 9165 * 0.453592
 fuel_mass = [100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000]
-
+Cmfuel = [298.16,591.18,879.08,1165.42,1448.40,1732.53,2014.80,2298.84,2581.92,2866.30,3150.18,3434.52,3718.52,4003.23,4287.76,4572.24,4856.56,5141.16,5425.64,5709.9,5994.04,6278.47,6562.82,6846.96,7131.00,7415.33,7699.60,7984.34,8269.06,8554.05,8839.04,9124.80,9410.62,9696.97,9983.40,10270.08,10556.84,10843.87,11131.00,11418.20]
 nosebaggagemass =0
 aftcabinmass =0
 aftcabinmass2 =0
@@ -56,28 +56,19 @@ Cms10 = seat10*mass_seat10
 Cmcab1 = aftcabbaggage*aftcabinmass
 Cmcab2 = aftcabbaggage2*aftcabinmass2
 Cmnose = nosebaggagemass * nosebaggage
-Cmfuel = [298.16,591.18,879.08,1165.42,1448.40,1732.53,2014.80,2298.84,2581.92,2866.30,3150.18,3434.52,3718.52,4003.23,4287.76,4572.24,4856.56,5141.16,5425.64,5709.9,5994.04,6278.47,6562.82,6846.96,7131.00,7415.33,7699.60,7984.34,8269.06,8554.05,8839.04,9124.80,9410.62,9696.97,9983.40,10270.08,10556.84,10843.87,11131.00,11418.20]
-print(np.interp([2000,3000,4000], fuel_mass, Cmfuel))
 
-#trapezoidal for fuel consumption
-#paste lists of fuel flow and time
-def trapezodial(x,y):
-    areaq1= []
-    weights = []
+def fuel_to_cg(fuel_used):
     cmtotal = []
     xcg = []
-    if len(x)!=len(y):
-        print("Length of the two list are not equal.")
-    area = 0
-    for i in range(len(x)-1):
-        area += (x[i+1]-x[i])/2 * (y[i+1]+y[i])
-        areaq1.append(area)  #Fuel used
-        for i in areaq1:
-            weights.append = ramp_mass - areaq1[-1] #Current aircraft weight
-            cmfuelcurrent = np.interp((fuel_mass[-1]-areaq1[-1]), fuel_mass, Cmfuel) #Interpolated value for cm_fuel
-            cmtotal.append(Cmramp + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose +cmfuelcurrent) #Current aircraft Cm
-            xcg.append(cmtotal[-1] / weights[-1])
-    return area,areaq1,weights, cmtotal, xcg
-print(Cmramp, Cms1, Cms2, Cms3, Cms4, Cms5, Cms6, Cms7, Cms8, Cms10)
+    for i in fuel_used:
+        current_fuel = 4000 - fuel_used[i]
+        current_weight = ramp_mass - fuel_used[i]
+        currentcmfuel = np.interp(current_fuel, fuel_mass, Cmfuel)
+        cmtotal.append(
+            Cmramp + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose + cmfuelcurrent)  # Current aircraft Cm)
+        xcg.append(cmtotal[i] / current_weight)
+    return xcg
+
+
 
 
