@@ -67,7 +67,7 @@ def fuel_to_cg(fuel_used):
         cmtotal.append(
             Cmramp + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose + cmfuelcurrent)  # Current aircraft Cm)
         xcg.append(cmtotal[i] / current_weight)
-    return xcg
+    return np.array(xcg)
 
 
 
