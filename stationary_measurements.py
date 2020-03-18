@@ -7,6 +7,7 @@ import isa
 import subprocess
 import stationary_flight_data as flight_data
 
+
 def cl_curve(alpha, cn_alpha, alpha_0):
     return cn_alpha * alpha - cn_alpha * alpha_0
 
@@ -98,6 +99,7 @@ def get_true_airspeed(height, measured_temperature, v_c):
 
     return M * a
 
+
 def get_reduced_equivalent_airspeed(weight, height, v_t):
     """
 
@@ -110,8 +112,9 @@ def get_reduced_equivalent_airspeed(weight, height, v_t):
     pressure = isa.get_p_at_temperature(temperature)
     density = isa.get_rho(pressure, temperature)
 
-    v_e = v_t*np.sqrt(density, isa.rho_0)
-    return  v_e*np.sqrt(cessna.W/weight)
+    v_e = v_t * np.sqrt(density, isa.rho_0)
+    return v_e * np.sqrt(cessna.W / weight)
+
 
 def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
     """
@@ -131,10 +134,18 @@ def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
     averaged_density = np.mean(density)
     averaged_v_t = np.mean(v_t)
 
-    cm_delta = -1/delta_de*averaged_weight/(0.5*averaged_density*np.power(averaged_v_t,2)*cessna.S)*delta_cg/cessna.c
-    cm_alpha = -delta_de/delta_alpha*cm_delta
+    cm_delta = (
+        -1
+        / delta_de
+        * averaged_weight
+        / (0.5 * averaged_density * np.power(averaged_v_t, 2) * cessna.S)
+        * delta_cg
+        / cessna.c
+    )
+    cm_alpha = -delta_de / delta_alpha * cm_delta
 
     return cm_alpha, cm_delta
+
 
 def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
     """
@@ -145,7 +156,8 @@ def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
     :param t_c: thrust coefficient
     :return: Reduced elevator deflection
     """
-    return de_measured* -1/cm_delta*cessna.Cm_tc*(t_cs-t_c)
+    return de_measured * -1 / cm_delta * cessna.Cm_tc * (t_cs - t_c)
+
 
 def get_thrust_coefficient(height, thrust, velocity):
     """
@@ -159,9 +171,20 @@ def get_thrust_coefficient(height, thrust, velocity):
     pressure = isa.get_p_at_temperature(temperature)
     density = isa.get_rho(pressure, temperature)
 
-    return thrust/(density*np.power(velocity,2)*np.power(cessna.D,2))
+    return thrust / (density * np.power(velocity, 2) * np.power(cessna.D, 2))
 
-def plot_reduced_elevator_trim_curve(weight, height, thrust, thrust_from_exe, v_t, de_measured_cg, alpha_measured_cg, de_measured_trim,delta_cg):
+
+def plot_reduced_elevator_trim_curve(
+    weight,
+    height,
+    thrust,
+    thrust_from_exe,
+    v_t,
+    de_measured_cg,
+    alpha_measured_cg,
+    de_measured_trim,
+    delta_cg,
+):
     """
 
     :param weight:
@@ -181,12 +204,16 @@ def plot_reduced_elevator_trim_curve(weight, height, thrust, thrust_from_exe, v_
     t_cs = get_thrust_coefficient(height, thrust_from_exe, reduced_velocity)
     t_c = get_thrust_coefficient(height, thrust, v_t)
 
-    _, cm_delta = get_cm_derivatives(weight, height, v_t, delta_cg, delta_de,delta_alpha)
-    reduced_elevator_deflection = get_reduced_elevator_deflection(de_measured_trim, cm_delta, t_cs, t_c)
-
+    _, cm_delta = get_cm_derivatives(
+        weight, height, v_t, delta_cg, delta_de, delta_alpha
+    )
+    reduced_elevator_deflection = get_reduced_elevator_deflection(
+        de_measured_trim, cm_delta, t_cs, t_c
+    )
 
     plt.plot(reduced_velocity, reduced_elevator_deflection)
     plt.show()
+
 
 def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     """
@@ -198,13 +225,15 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     :return:
     """
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
-    reduced_force = f_e*weight/cessna.W
+    reduced_force = f_e * weight / cessna.W
 
     plt.plot(reduced_velocity, reduced_force)
     plt.show()
 
 
-def run_thrust_exe(height, calibrated_airspeed, fuel_flow_left, fuel_flow_right, measured_temperature):
+def run_thrust_exe(
+    height, calibrated_airspeed, fuel_flow_left, fuel_flow_right, measured_temperature
+):
     """[summary]
     
     :param height: from stationary measurements 
@@ -213,25 +242,50 @@ def run_thrust_exe(height, calibrated_airspeed, fuel_flow_left, fuel_flow_right,
     :param fuel_flow_right: from stationary measurements 
     :param measured_temperature: from stationary measurements 
     :return: array of thrust values for both engines for each stationary measurement from thrust.exe program 
-    """    
+    """
     mach_number = get_mach_number(height, calibrated_airspeed)
     temperature_delta = measured_temperature - isa.get_t_at_height(height)
-    matlab_data = np.vstack([height, mach_number, fuel_flow_left, fuel_flow_right, temperature_delta]).T
+    matlab_data = np.vstack(
+        [height, mach_number, temperature_delta, fuel_flow_left, fuel_flow_right]
+    ).T
     np.savetxt("matlab.dat", matlab_data, delimiter=" ")
     subprocess.call("thrust.exe")
-    thrust = np.genfromtxt("thrust.dat")[:,0]*2 #per engine, therfore x2
+    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
     return thrust
+
 
 def get_thrust_from_thrust_dat():
     """[summary]
     
     :return: array of thrust values for both engines for each stationary measurement read from .dat file
-    """    
-    thrust = np.genfromtxt("thrust.dat")[:, 0] * 2  # per engine, therfore x2
+    """
+    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
     return thrust
 
-true_airspeed = get_true_airspeed(flight_data.sm1_alt, flight_data.sm1_temp, flight_data.sm1_IAS)
-cl_alpha, alpha_0, cn = get_cl_params(flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt,true_airspeed)
-sm1_thrust =np.array([7259.3,  6334.22, 4817.2,  3784.28, 3602.42, 4594.08]) #TODO CHANGE WHEN DATA IS CHANGED
 
-cd_0, e, cd = get_cd_params(flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt, true_airspeed, sm1_thrust)
+true_airspeed = get_true_airspeed(
+    flight_data.sm1_alt, flight_data.sm1_temp, flight_data.sm1_IAS
+)
+cl_alpha, alpha_0, cn = get_cl_params(
+    flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt, true_airspeed
+)
+sm1_thrust = np.array(
+    [
+        [3344.72, 3614.84],
+        [2659.06, 2992.44],
+        [2083.2, 2415.26],
+        [1649.02, 2007.21],
+        [1908.99, 2205.1],
+        [1813.13, 2142.53],
+    ]
+)
+
+cd_0, e, cd = get_cd_params(
+    flight_data.sm1_alpha,
+    flight_data.sm1_weight,
+    flight_data.sm1_alt,
+    true_airspeed,
+    sm1_thrust,
+)
+
+cm_alpha, cm_delta = get_cm_derivatives()
