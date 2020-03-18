@@ -6,6 +6,7 @@ import Cit_par as cessna
 import isa
 import subprocess
 import stationary_flight_data as flight_data
+import weight
 
 
 def cl_curve(alpha, cn_alpha, alpha_0):
@@ -263,13 +264,15 @@ def get_thrust_from_thrust_dat():
     return thrust
 
 
+# Stationary Measurement 1 
+
 true_airspeed = get_true_airspeed(
     flight_data.sm1_alt, flight_data.sm1_temp, flight_data.sm1_IAS
 )
 cl_alpha, alpha_0, cn = get_cl_params(
     flight_data.sm1_alpha, flight_data.sm1_weight, flight_data.sm1_alt, true_airspeed
 )
-sm1_thrust = np.array(
+sm1_thrust_per_engine = np.array(
     [
         [3344.72, 3614.84],
         [2659.06, 2992.44],
@@ -279,6 +282,8 @@ sm1_thrust = np.array(
         [1813.13, 2142.53],
     ]
 )
+sm1_thrust = sm1_thrust_per_engine[:,0]+sm1_thrust_per_engine[:,1]
+
 
 cd_0, e, cd = get_cd_params(
     flight_data.sm1_alpha,
@@ -288,4 +293,25 @@ cd_0, e, cd = get_cd_params(
     sm1_thrust,
 )
 
-cm_alpha, cm_delta = get_cm_derivatives()
+# Stationary Measurement 2
+
+true_airspeed_sm2 = get_true_airspeed(
+    flight_data.sm2_alt, flight_data.sm2_temp, flight_data.sm2_IAS
+)
+
+# Stationary Measurement 3 
+
+sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]*flight_data.sm3_weight[0]/9.81
+sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]/9.81
+cg_shift = (weight.Cms8 - weight.mass_seat8*weight.seat1)
+delta_cg = (sm3_cg_arm1 - sm3_cg_arm2 - cg_shift)/(flight_data.sm3_weight[0]/9.81)
+
+true_airspeed_sm3 = get_true_airspeed(
+    flight_data.sm3_alt, flight_data.sm3_temp, flight_data.sm3_IAS
+)
+delta_de = np.diff(flight_data.sm3_delta_e)
+delta_alpha = np.diff(flight_data.sm3_alpha)
+cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, delta_alpha)
+
+print(cm_alpha)
+print(cm_delta)

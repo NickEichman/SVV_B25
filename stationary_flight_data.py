@@ -11,7 +11,7 @@ sm1_IAS = np.array([249,217,189,162,129,119])*0.514444              # [m/s]
 sm1_alpha = np.array([1.7,2.8,3.7,5.6,9.1,10.7])*np.pi/180          # [rad]
 sm1_FFl = np.array([731,599,491,410,420,400])*0.453592/(3600)       # [kg/s]
 sm1_FFr = np.array([770,647,538,459,458,442])*0.453592/(3600)       # [kg/s]
-sm1_F_used = np.array([361,408,440,481,525,555])*0.453592           # [kg/s]
+sm1_F_used = np.array([361,408,440,481,525,555])*0.453592           # [kg]
 sm1_temp = np.array([-0.5,-3,-4.8,-6,-7.5,-8])+273.15               # [K]
 sm1_weight = (takeoff_mass - sm1_F_used) * g
 
@@ -28,7 +28,7 @@ sm2_delta_tr = np.array([3.6,3.6,3.6,3.6,3.5,3.5,3.5])*np.pi/180        # [rad]
 sm2_Fe = np.array([0,-17,-34,-42,32,61,86])                             # [N]
 sm2_FFl = np.array([443,441,434,430,450,463,471])*0.453592/(3600)       # [kg/s]
 sm2_FFr = np.array([481,479,472,469,489,500,510])*0.453592/(3600)       # [kg/s]
-sm2_F_used = np.array([627,650,671,688,717,773,791])*0.453592           # [kg/s]
+sm2_F_used = np.array([627,650,671,688,717,773,791])*0.453592           # [kg]
 sm2_temp = np.array([-5.5,-6.2,-7,-8.2,-5,-2.2,-1])+273.15              # [K]
 sm2_weight = (takeoff_mass - sm2_F_used) * g
 
@@ -43,7 +43,7 @@ sm3_delta_tr = np.array([3.5,3.5])*np.pi/180                            # [rad]
 sm3_Fe = np.array([0,-38])                                              # [N]
 sm3_FFl = np.array([457,455])*0.453592/(3600)                           # [kg/s]
 sm3_FFr = np.array([495,490])*0.453592/(3600)                           # [kg/s]
-sm3_F_used = np.array([820,852])*0.453592                               # [kg/s]
+sm3_F_used = np.array([820,852])*0.453592                               # [kg]
 sm3_temp = np.array([-3.5,-4])+273.15                                   # [K]
 sm3_weight = (takeoff_mass - sm3_F_used) * g
 
