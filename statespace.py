@@ -1,4 +1,4 @@
-import Cit_par_ver as cs
+import Cit_par as cs
 import numpy as np
 
 def get_ss_symmetric():
