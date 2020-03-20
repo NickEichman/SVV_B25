@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.io as scio
-import matplotlib.pyplot as plt
 
+## Imports and slices input from the given flight data, in all of the eigenmotion flight sections
 # flight sections
 short_period_time_start = 31200
 short_period_time_end = 31800
@@ -19,7 +19,7 @@ aperiodic_roll_time_start = 36000
 aperiodic_roll_time_end = 36600
 
 spiral_time_start = 36600
-spiral_time_end = 37800
+spiral_time_end = 37800  # Guesstimate
 
 # lh stands for left engine, engine 1
 # rh stands for right engine, engine 2
