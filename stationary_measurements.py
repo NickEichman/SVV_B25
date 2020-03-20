@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
+from scipy import stats
 
 import Cit_par as cessna
 import isa
@@ -117,7 +118,7 @@ def get_reduced_equivalent_airspeed(weight, height, v_t):
     return v_e * np.sqrt(cessna.W / weight)
 
 
-def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
+def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, dd_dalpha):
     """
 
     :param weight:
@@ -143,7 +144,7 @@ def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
         * delta_cg
         / cessna.c
     )
-    cm_alpha = -delta_de / delta_alpha * cm_delta
+    cm_alpha = - dd_dalpha * cm_delta
 
     return cm_alpha, cm_delta
 
@@ -300,16 +301,17 @@ true_airspeed_sm3 = get_true_airspeed(
     flight_data.sm3_alt, flight_data.sm3_temp, flight_data.sm3_IAS
 )
 delta_de = np.diff(flight_data.sm3_delta_e)
-delta_alpha = np.diff(flight_data.sm3_alpha)
-cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, delta_alpha)
+dd_dalpha = stats.mstats.linregress(flight_data.sm2_alpha, flight_data.sm2_delta_e)[0]
+cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, dd_dalpha)
 
 print(cm_alpha)
 print(cm_delta)
 
+
 # Stationary Measurement 2
 
 cm_delta = -1.649
-
+"""
 true_airspeed_sm2 = get_true_airspeed(
     flight_data.sm2_alt, flight_data.sm2_temp, flight_data.sm2_IAS
 )
@@ -339,3 +341,4 @@ plot_reduced_elevator_trim_curve(flight_data.sm2_weight, flight_data.sm2_alt,sm2
 print(cl_alpha)
 print(cd_0)
 print(e)
+"""
