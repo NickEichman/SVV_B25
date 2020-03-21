@@ -22,7 +22,7 @@ mass_seat8 = 86
 mass_seat10 = 68
 payloadmass = mass_seat1+mass_seat2+mass_seat3+mass_seat4+mass_seat5+mass_seat6+mass_seat7+mass_seat8+mass_seat10+nosebaggagemass+aftcabinmass+aftcabinmass2
 ramp_mass = 14852 * 0.453592
-m_fuel = 4100 * 0.453592
+m_fuel = 4050 * 0.453592
 
 #xcgdatum and xcg function calculations
 #xcg positions of all components [INCHES]
