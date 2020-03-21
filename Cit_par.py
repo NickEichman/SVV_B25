@@ -20,8 +20,8 @@ CD0 = 0.02096  # Zero lift drag coefficient [ ]
 CLa = 4.7004  # Slope of CL-alpha curve [ ]
 
 # Longitudinal stability
-Cma = -0.756  # longitudinal stabilty [ ] #TODO change to our values
-Cmde = -1.649  # elevator effectiveness [ ] #TODO change to our values
+Cma = -0.63388  # longitudinal stabilty [ ]
+Cmde = -1.39711  # elevator effectiveness [ ]
 
 # Aircraft geometry
 
@@ -112,7 +112,7 @@ Cnda = -0.0120
 Cndr = -0.0939
 
 #Pitch moment derivatives
-Cm_tc = -0.0064 # TODO gotta check this.just taken this form document
+Cm_tc = -0.0064
 
 #Engine characteristic diameter
-D = 0.5 #random value TODO think about that
+D = 0.5
