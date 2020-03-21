@@ -226,9 +226,15 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     """
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
     reduced_force = f_e * cessna.W/weight
+        
+    v_fit = np.sort(reduced_velocity, axis=-1, kind='quicksort', order=None)
+    de_fit = np.sort(reduced_force, axis=-1, kind='quicksort', order=None)
+    fit = np.polyfit(v_fit, de_fit, 1)
 
-    plt.scatter(reduced_velocity, reduced_force)
+    plt.plot(v_fit,fit[0]*v_fit+fit[1], label = "polynomial curve fit")
+    plt.scatter(reduced_velocity, reduced_force, color = "red", label = "measurement data")
     plt.gca().invert_yaxis()
+    plt.legend(loc = "best")
     plt.show()
 
 
