@@ -290,12 +290,15 @@ cd_0, e, cd = get_cd_params(
 
 # Stationary Measurement 3 
 
-sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]*flight_data.sm3_weight[0]/9.81
-sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]/9.81
-cg_shift = (weight.Cms8 - weight.mass_seat8*weight.seat1)
-# delta_cg = (sm3_cg_arm1 - sm3_cg_arm2 - cg_shift)/(flight_data.sm3_weight[0]/9.81)
+sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]*flight_data.sm3_weight[0]
+sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]
+cg_shift = (- weight.Cms8 + weight.mass_seat8*weight.seat1)*9.81
+delta_cg = (- sm3_cg_arm1 + sm3_cg_arm2 + cg_shift)/(flight_data.sm3_weight[1])
 
-delta_cg = -0.26992
+#new_cg = (weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]/9.81 + weight.mass_seat8*(weight.seat1 - weight.seat8))/(flight_data.sm3_weight[1]/9.81)
+#delta_cg = new_cg - weight.fuel_to_cg(flight_data.sm3_F_used)[0]
+print(delta_cg)
+#delta_cg = -0.26992
 true_airspeed_sm3 = get_true_airspeed(
     flight_data.sm3_alt, flight_data.sm3_temp, flight_data.sm3_IAS
 )
@@ -303,9 +306,10 @@ delta_de = np.diff(flight_data.sm3_delta_e)
 dd_dalpha = stats.mstats.linregress(flight_data.sm2_alpha, flight_data.sm2_delta_e)[0]
 cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, dd_dalpha)
 
-# Stationary Measurement 2
+print(cm_alpha)
+print(cm_delta)
 
-cm_delta = -1.649
+# Stationary Measurement 2
 
 true_airspeed_sm2 = get_true_airspeed(
     flight_data.sm2_alt, flight_data.sm2_temp, flight_data.sm2_IAS
