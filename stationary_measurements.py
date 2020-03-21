@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
+from scipy import stats
 
 import Cit_par as cessna
 import isa
@@ -117,7 +118,7 @@ def get_reduced_equivalent_airspeed(weight, height, v_t):
     return v_e * np.sqrt(cessna.W / weight)
 
 
-def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
+def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, dd_dalpha):
     """
 
     :param weight:
@@ -143,7 +144,7 @@ def get_cm_derivatives(weight, height, v_t, delta_cg, delta_de, delta_alpha):
         * delta_cg
         / cessna.c
     )
-    cm_alpha = -delta_de / delta_alpha * cm_delta
+    cm_alpha = - dd_dalpha * cm_delta
 
     return cm_alpha, cm_delta
 
@@ -157,7 +158,7 @@ def get_reduced_elevator_deflection(de_measured, cm_delta, t_cs, t_c):
     :param t_c: thrust coefficient
     :return: Reduced elevator deflection
     """
-    return de_measured * (-1 / cm_delta * cessna.Cm_tc * (t_cs - t_c))
+    return de_measured  -1 / cm_delta * cessna.Cm_tc * (t_cs - t_c)
 
 
 def get_thrust_coefficient(height, thrust, velocity):
@@ -199,14 +200,18 @@ def plot_reduced_elevator_trim_curve(
 
     t_cs = get_thrust_coefficient(height, standard_thrust, reduced_velocity)
     t_c = get_thrust_coefficient(height, thrust, v_t)
-    print(t_cs-t_c)
 
     reduced_elevator_deflection = get_reduced_elevator_deflection(
         de_measured_trim, cm_delta, t_cs, t_c
     )
+    v_fit = np.sort(reduced_velocity, axis=-1, kind='quicksort', order=None)
+    de_fit = np.sort(reduced_elevator_deflection, axis=-1, kind='quicksort', order=None)
+    fit = np.polyfit(v_fit, de_fit, 2)
 
-    plt.plot(reduced_velocity, reduced_elevator_deflection)
+    plt.plot(v_fit, fit[0]*np.power(v_fit,2)+fit[1]*v_fit+fit[2], label = "polynomial curve fit")
+    plt.scatter(reduced_velocity, reduced_elevator_deflection, color = "red", label = "measurement data")
     plt.gca().invert_yaxis()
+    plt.legend(loc = "best")
     plt.show()
 
 
@@ -220,10 +225,9 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     :return:
     """
     reduced_velocity = get_reduced_equivalent_airspeed(weight, height, v_t)
-    print(reduced_velocity)
     reduced_force = f_e * cessna.W/weight
 
-    plt.plot(reduced_velocity, reduced_force)
+    plt.scatter(reduced_velocity, reduced_force)
     plt.gca().invert_yaxis()
     plt.show()
 
@@ -247,7 +251,8 @@ def run_thrust_exe(
     ).T
     np.savetxt("matlab.dat", matlab_data, delimiter=" ")
     subprocess.call("thrust.exe")
-    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
+    thrust = np.genfromtxt("thrust.dat")  
+    thrust = thrust[:,0] + thrust[:,1]
     return thrust
 
 
@@ -256,7 +261,8 @@ def get_thrust_from_thrust_dat():
     
     :return: array of thrust values for both engines for each stationary measurement read from .dat file
     """
-    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
+    thrust = np.genfromtxt("thrust.dat")  
+    thrust = thrust[:,0] + thrust[:,1]
     return thrust
 
 
@@ -291,24 +297,24 @@ cd_0, e, cd = get_cd_params(
 
 # Stationary Measurement 3 
 
-sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]*flight_data.sm3_weight[0]/9.81
-sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]/9.81
-cg_shift = (weight.Cms8 - weight.mass_seat8*weight.seat1)
-delta_cg = (sm3_cg_arm1 - sm3_cg_arm2 - cg_shift)/(flight_data.sm3_weight[0]/9.81)
+sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]*flight_data.sm3_weight[0]
+sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1]*flight_data.sm3_weight[1]
+cg_shift = (- weight.mass_seat8*weight.seat8 + weight.mass_seat8*weight.seat1)*9.81
+delta_cg = (- sm3_cg_arm1 + sm3_cg_arm2 + cg_shift)/(flight_data.sm3_weight[1])
+
+#delta_cg = -0.26992 TODO get closer to this value
 
 true_airspeed_sm3 = get_true_airspeed(
     flight_data.sm3_alt, flight_data.sm3_temp, flight_data.sm3_IAS
 )
 delta_de = np.diff(flight_data.sm3_delta_e)
-delta_alpha = np.diff(flight_data.sm3_alpha)
-cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, delta_alpha)
+dd_dalpha = stats.mstats.linregress(flight_data.sm2_alpha, flight_data.sm2_delta_e)[0]
+cm_alpha, cm_delta = get_cm_derivatives(flight_data.sm3_weight, flight_data.sm3_alt, true_airspeed_sm3, delta_cg, delta_de, dd_dalpha)
 
-print(cm_alpha)
-print(cm_delta)
+print("cm_alpha = ", cm_alpha[0])
+print("cm_delta = ", cm_delta[0])
 
 # Stationary Measurement 2
-
-cm_delta = -1.649
 
 true_airspeed_sm2 = get_true_airspeed(
     flight_data.sm2_alt, flight_data.sm2_temp, flight_data.sm2_IAS
@@ -334,8 +340,5 @@ sm2_standard_thrust_per_engine = np.array([[1404.54, 1404.54],
 sm2_standard_thrust = sm2_standard_thrust_per_engine[:,0]+sm2_standard_thrust_per_engine[:,1]
 
 plot_elevator_force_control_curve(flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe)
-plot_reduced_elevator_trim_curve(flight_data.sm2_weight, flight_data.sm2_alt,sm2_thrust, sm2_standard_thrust, true_airspeed_sm2, cm_delta, flight_data.sm2_delta_tr)
+plot_reduced_elevator_trim_curve(flight_data.sm2_weight, flight_data.sm2_alt,sm2_thrust, sm2_standard_thrust, true_airspeed_sm2, cm_delta, flight_data.sm2_delta_e)
 
-print(cl_alpha)
-print(cd_0)
-print(e)
