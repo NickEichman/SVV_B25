@@ -204,9 +204,14 @@ def plot_reduced_elevator_trim_curve(
     reduced_elevator_deflection = get_reduced_elevator_deflection(
         de_measured_trim, cm_delta, t_cs, t_c
     )
+    v_fit = np.sort(reduced_velocity, axis=-1, kind='quicksort', order=None)
+    de_fit = np.sort(reduced_elevator_deflection, axis=-1, kind='quicksort', order=None)
+    fit = np.polyfit(v_fit, de_fit, 2)
 
-    plt.scatter(reduced_velocity, reduced_elevator_deflection)
+    plt.plot(v_fit, fit[0]*np.power(v_fit,2)+fit[1]*v_fit+fit[2], label = "polynomial curve fit")
+    plt.scatter(reduced_velocity, reduced_elevator_deflection, color = "red", label = "measurement data")
     plt.gca().invert_yaxis()
+    plt.legend(loc = "best")
     plt.show()
 
 
