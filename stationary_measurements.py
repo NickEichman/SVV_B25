@@ -251,7 +251,8 @@ def run_thrust_exe(
     ).T
     np.savetxt("matlab.dat", matlab_data, delimiter=" ")
     subprocess.call("thrust.exe")
-    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
+    thrust = np.genfromtxt("thrust.dat")  
+    thrust = thrust[:,0] + thrust[:,1]
     return thrust
 
 
@@ -260,7 +261,8 @@ def get_thrust_from_thrust_dat():
     
     :return: array of thrust values for both engines for each stationary measurement read from .dat file
     """
-    thrust = np.genfromtxt("thrust.dat")  # per engine, therfore x2
+    thrust = np.genfromtxt("thrust.dat")  
+    thrust = thrust[:,0] + thrust[:,1]
     return thrust
 
 
