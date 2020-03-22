@@ -167,7 +167,6 @@ def get_mach_number(height, v_c):
         1 + isa.p_0 / pressure * (innermost - 1), (isa.gamma - 1) / isa.gamma
     )
     M = np.sqrt(2 / (isa.gamma - 1) * (middle - 1))
-
     return M
 
 
@@ -182,7 +181,6 @@ def get_true_airspeed(height, measured_temperature, v_c):
     M = get_mach_number(height, v_c)
     temperature = measured_temperature / (1 + (isa.gamma - 1) / 2 * np.power(M, 2))
     a = isa.get_speed_of_sound(temperature)
-
     return M * a
 
 
@@ -530,7 +528,7 @@ if __name__=="__main__":
     cg_shift = (-weight.mass_seat8 * weight.seat8 + weight.mass_seat8 * weight.seat1) * 9.81
     delta_cg = (-sm3_cg_arm1 + sm3_cg_arm2 + cg_shift) / (flight_data.sm3_weight[1])
 
-    cm_alpha, cm_delta = get_cm_derivatives(
+    cm_alpha_new, cm_delta_new = get_cm_derivatives(
         flight_data.sm3_weight,
         flight_data.sm3_alt,
         true_airspeed_sm3,
@@ -539,5 +537,7 @@ if __name__=="__main__":
         dd_dalpha,
     )
 
-    print("modified cm_alpha = ", cm_alpha)
-    print("modified cm_delta = ", cm_delta)
+    print("modified cm_alpha = ", cm_alpha_new)
+    print("modified cm_delta = ", cm_delta_new)
+
+    assert cm_alpha_new < cm_alpha[0], "cm_alpha is not reducing with a foward shift in cg"
