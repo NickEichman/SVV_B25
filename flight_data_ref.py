@@ -108,10 +108,11 @@ def get_data_eigen(n):
     roll_rate = ahrs1_b_roll_rate[start:end]
     pitch_rate = ahrs1_b_pitch_rate[start:end]
     yaw_rate = ahrs1_b_yaw_rate[start:end]
-    elevator_trim = elevator_dte[start:end]
     aileron_def = delta_a[start:end]
     elevator_def = delta_e[start:end]
     rudder_def = delta_r[start:end]
+    pressure_alt = dadc1_alt[start:end]
+    time_slice = np.arange(0, (end - start) * 0.1, 0.1)
 
-    return aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, elevator_trim, aileron_def, elevator_def, \
-           rudder_def
+    return [aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, aileron_def, elevator_def, rudder_def,
+            pressure_alt], time_slice
