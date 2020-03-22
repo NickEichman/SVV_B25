@@ -4,7 +4,7 @@ import scipy.io as scio
 ## Imports and slices input from the given flight data, in all of the flight sections
 
 # Eigenmotion flight sections
-short_period_time_start = 31495#31200
+short_period_time_start = 31450#31200
 short_period_time_end = 31560#31800
 
 phugoid_time_start = 32240#31800
