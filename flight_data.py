@@ -4,11 +4,12 @@ import scipy.io as scio
 ## Imports and slices input from the given flight data, in all of the flight sections
 
 # Eigenmotion flight sections
-short_period_time_start = 31450#31200
-short_period_time_end = 31560#31800
+short_period_time_start = 31495  # Original: 31200
+short_period_time_end = 31560  # Original: 31800
 
-phugoid_time_start = 32240#31800
-phugoid_time_end = 33930#
+
+phugoid_time_start = 32240  # Original: 31800
+phugoid_time_end = 33930
 
 dutch_roll_time_start = 34200
 dutch_roll_time_end = 34800
@@ -81,7 +82,8 @@ totalfuelflow = lh_engine_fmf+rh_engine_fmf
 # Function to get all pertaining data for the eigenmotions. n is the eigenmotion chosen, 0 is short period, 1 phugoid,
 # 2 dutch roll, 3 dutch roll yaw dampening, 4 aperiodic roll and 5 spiral. Returns the following numpy arrays, in order:
 # Angle of attack, true air speed, roll angle, pitch angle, yaw angle? it is not certain what it is from the matlab file
-# roll rate, pitch rate, yaw rate, elevator trim deflection, aileron deflection, elevator deflection, rudder deflection
+# roll rate, pitch rate, yaw rate, aileron deflection, elevator deflection, rudder deflection, pressure altitude
+# and elevator trim
 def get_data_eigen(n):
     if n == 0:
         start = short_period_time_start
@@ -109,11 +111,13 @@ def get_data_eigen(n):
     roll_rate = ahrs1_b_roll_rate[start:end]
     pitch_rate = ahrs1_b_pitch_rate[start:end]
     yaw_rate = ahrs1_b_yaw_rate[start:end]
+    elevator_trim = elevator_dte[start:end]
     aileron_def = delta_a[start:end]
     elevator_def = delta_e[start:end]
     rudder_def = delta_r[start:end]
     pressure_alt = dadc1_alt[start:end]
-    time_slice = np.arange(0, (end-start)*0.1, 0.1)
-    
-    return [aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, aileron_def, elevator_def, rudder_def,
-            pressure_alt], time_slice
+    time_slice = np.arange(0, (end - start) * 0.1, 0.1)
+
+    return [aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, aileron_def, elevator_def,
+            rudder_def, pressure_alt, elevator_trim], time_slice
+
