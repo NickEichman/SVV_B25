@@ -233,7 +233,7 @@ def get_thrust_coefficient(height, thrust, velocity):
     return thrust / (density * np.power(velocity, 2) * np.power(cessna.D, 2))
 
 def plot_reduced_elevator_trim_curve(
-    weight, height, thrust, standard_thrust, v_t, cm_delta, de_measured_trim
+    weight, height, thrust, standard_thrust, v_t, cm_delta, de_measured_trim, test = False
 ):
     """
 
@@ -260,23 +260,32 @@ def plot_reduced_elevator_trim_curve(
 
     r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2])
 
-    plt.plot(
-        v_fit,
-        fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
-        label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2,4)),
-    )
-    plt.scatter(
-        reduced_velocity,
-        reduced_elevator_deflection,
-        color="red",
-        label="Measured data",
-    )
+    if test == False:
+        plt.plot(
+            v_fit,
+            fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
+            label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2,4)),
+        )
+        plt.scatter(
+            reduced_velocity,
+            reduced_elevator_deflection,
+            color="red",
+            label="Measured data",
+        )
+    else:
+        plt.plot(
+            v_fit,
+            fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
+            label=r"cm_delta = "+str(round(cm_delta[0], 3)),
+        )
+
     plt.grid()
     plt.gca().invert_yaxis()
     plt.ylabel(r"$-\delta^{*}_{eq}$ $[rad]$", fontsize="x-large")
     plt.xlabel(r"$\tilde{V}_{eq}$ $[\frac{m}{s}]$", fontsize="x-large")
     plt.legend(loc="best")
-    plt.show()
+    if test == False:
+        plt.show()
 
 
 def plot_elevator_force_control_curve(weight, height, v_t, f_e):
@@ -305,6 +314,7 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     plt.ylabel(r"$-F^{*}_{e}$ $[rad]$", fontsize="x-large")
     plt.xlabel(r"$\tilde{V}_{eq}$ $[\frac{m}{s}]$", fontsize="x-large")
     plt.legend(loc="best")
+   
     plt.show()
 
 
@@ -393,6 +403,8 @@ cm_alpha, cm_delta = get_cm_derivatives(
     delta_de,
     dd_dalpha,
 )
+print("cm_alpha = ", cm_alpha)
+print("cm_delta = ", cm_delta)
 
 # Stationary Measurement 2
 
@@ -429,17 +441,72 @@ sm2_standard_thrust = (
     sm2_standard_thrust_per_engine[:, 0] + sm2_standard_thrust_per_engine[:, 1]
 )
 
-# plot_elevator_force_control_curve(
-#     flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
-# )
-# plot_reduced_elevator_trim_curve(
-#     flight_data.sm2_weight,
-#     flight_data.sm2_alt,
-#     sm2_thrust,
-#     sm2_standard_thrust,
-#     true_airspeed_sm2,
-#     cm_delta,
-#     flight_data.sm2_delta_e,
-# )
-# plot_cl_alpha_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
+
+# Plotting 
+"""
+plot_elevator_force_control_curve(
+     flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
+ )
+plot_reduced_elevator_trim_curve(
+     flight_data.sm2_weight,
+     flight_data.sm2_alt,
+     sm2_thrust,
+     sm2_standard_thrust,
+     true_airspeed_sm2,
+     cm_delta,
+     flight_data.sm2_delta_e,
+ )
+plot_cl_alpha_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
 plot_cl_cd_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
+"""
+
+
+if __name__=="__main__":
+    """
+    Test 1:
+    Moving cg aft reduces slope of cm_alpha. Test 1 assesses impact on trim curves when moving cg aft 
+    The elevator deflection is also reduced accordingly. It is ecpected that initial magnitude and slope reduce 
+    """
+    cm_alpha = np.array([cm_alpha, cm_alpha*0.8, cm_alpha*0.4, cm_alpha*0.2, cm_alpha*0.1])
+    cm_delta = -cm_alpha/dd_dalpha
+    delta_e = np.array([flight_data.sm2_delta_e, flight_data.sm2_delta_e*0.8, flight_data.sm2_delta_e*0.4, flight_data.sm2_delta_e*0.2, flight_data.sm2_delta_e*0.1])
+
+    for i in range(len(cm_alpha)):
+
+        plot_reduced_elevator_trim_curve(
+        flight_data.sm2_weight,
+        flight_data.sm2_alt,
+        sm2_thrust,
+        sm2_standard_thrust,
+        true_airspeed_sm2,
+        cm_delta[i],
+        delta_e[i],
+        True
+        )
+    
+    plt.show()
+
+    """
+    Test 2:
+    Increase Fuel used and assess impact on cm_alpha and cm_delta. Both should become less negative as cg moves aft 
+    Reducing ampunt of fuel moves cg forward
+    """
+
+    flight_data.sm3_F_used *= 1.5
+
+    sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0] * flight_data.sm3_weight[0]
+    sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1] * flight_data.sm3_weight[1]
+    cg_shift = (-weight.mass_seat8 * weight.seat8 + weight.mass_seat8 * weight.seat1) * 9.81
+    delta_cg = (-sm3_cg_arm1 + sm3_cg_arm2 + cg_shift) / (flight_data.sm3_weight[1])
+
+    cm_alpha, cm_delta = get_cm_derivatives(
+        flight_data.sm3_weight,
+        flight_data.sm3_alt,
+        true_airspeed_sm3,
+        delta_cg,
+        delta_de,
+        dd_dalpha,
+    )
+
+    print("modified cm_alpha = ", cm_alpha)
+    print("modified cm_delta = ", cm_delta)
