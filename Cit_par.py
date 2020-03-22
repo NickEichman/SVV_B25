@@ -5,114 +5,116 @@ import numpy as np
 # xcg = 0.25 * c
 
 # Stationary flight condition
+class Cit_par:
+    def __init__(self,aoa0,height0,Vel0,theta0):
+        self.hp0 = height0 # pressure altitude in the stationary flight condition [m]
+        self.V0 = Vel0 # true airspeed in the stationary flight condition [m/sec]
+        self.alpha0 = aoa0  # angle of attack in the stationary flight condition [rad]
+        self.th0 = theta0  # pitch angle in the stationary flight condition [rad]
 
-hp0 = 1  # pressure altitude in the stationary flight condition [m]
-V0 = 60 # true airspeed in the stationary flight condition [m/sec]
-alpha0 = 1  # angle of attack in the stationary flight condition [rad]
-th0 = 1  # pitch angle in the stationary flight condition [rad]
+        # Aircraft mass
+        self.m = 13600*0.453592  # mass [kg]
 
-# Aircraft mass
-m = 13600*0.453592  # mass [kg]
+        # aerodynamic properties
+        self.e = 0.865326  # Oswald factor [ ]
+        self.CD0 = 0.02096  # Zero lift drag coefficient [ ]
+        self.CLa = 4.7004  # Slope of CL-alpha curve [ ]
 
-# aerodynamic properties
-e = 0.865326  # Oswald factor [ ]
-CD0 = 0.02096  # Zero lift drag coefficient [ ]
-CLa = 4.7004  # Slope of CL-alpha curve [ ]
+        # Longitudinal stability
 
-# Longitudinal stability
-Cma = -0.63388  # longitudinal stabilty [ ]
-Cmde = -1.39711  # elevator effectiveness [ ]
+        self.Cma = -0.63388  # longitudinal stabilty [ ]
+        self.Cmde = -1.39711  # elevator effectiveness [ ]
 
-# Aircraft geometry
+        # Aircraft geometry
 
-S = 30.00  # wing area [m^2]
-Sh = 0.2 * S  # stabiliser area [m^2]
-Sh_S = Sh / S  # [ ]
-lh = 0.71 * 5.968  # tail length [m]
-c = 2.0569  # mean aerodynamic cord [m]
-lh_c = lh / c  # [ ]
-b = 15.911  # wing span [m]
-bh = 5.791  # stabilser span [m]
-A = b ** 2 / S  # wing aspect ratio [ ]
-Ah = bh ** 2 / Sh  # stabilser aspect ratio [ ]
-Vh_V = 1  # [ ]
-ih = -2 * np.pi / 180  # stabiliser angle of incidence [rad]
+        self.S = 30.00  # wing area [m^2]
+        self.Sh = 0.2 * self.S  # stabiliser area [m^2]
+        self.Sh_S = self.Sh / self.S  # [ ]
+        self.lh = 0.71 * 5.968  # tail length [m]
+        self.c = 2.0569  # mean aerodynamic cord [m]
+        self.lh_c = self.lh / self.c  # [ ]
+        self.b = 15.911  # wing span [m]
+        self.bh = 5.791  # stabilser span [m]
+        self.A = self.b ** 2 / self.S  # wing aspect ratio [ ]
+        self.Ah = self.bh ** 2 / self.Sh  # stabilser aspect ratio [ ]
+        self.Vh_V = 1  # [ ]
+        self.ih = -2 * np.pi / 180  # stabiliser angle of incidence [rad]
 
-# Constant values concerning atmosphere and gravity
+        # Constant values concerning atmosphere and gravity
 
-rho0 = 1.2250  # air density at sea level [kg/m^3]
-lamb = -0.0065  # temperature gradient in ISA [K/m]
-Temp0 = 288.15  # temperature at sea level in ISA [K]
-R = 287.05  # specific gas constant [m^2/sec^2K]
-g = 9.81  # [m/sec^2] (gravity constant)
+        rho0 = 1.2250  # air density at sea level [kg/m^3]
+        lamb = -0.0065  # temperature gradient in ISA [K/m]
+        Temp0 = 288.15  # temperature at sea level in ISA [K]
+        R = 287.05  # specific gas constant [m^2/sec^2K]
+        g = 9.81  # [m/sec^2] (gravity constant)
 
-# air density [kg/m^3]
-rho = rho0 * np.power(((1 + (lamb * hp0 / Temp0))), (-((g / (lamb * R)) + 1)))
-W = m * g  # [N]       (aircraft weight)
+        # air density [kg/m^3]
+        self.rho = rho0 * np.power(((1 + (lamb * self.hp0 / Temp0))), (-((g / (lamb * R)) + 1)))
+        self.W = self.m * g  # [N]       (aircraft weight)
 
-# Constant values concerning aircraft inertia
+        # Constant values concerning aircraft inertia
 
-muc = m / (rho * S * c)
-mub = m / (rho * S * b)
-KX2 = 0.019
-KZ2 = 0.042
-KXZ = 0.002
-KY2 = 1.25 * 1.114
+        self.muc = self.m / (self.rho * self.S * self.c)
+        self.mub = self.m / (self.rho * self.S * self.b)
+        self.KX2 = 0.019
+        self.KZ2 = 0.042
+        self.KXZ = 0.002
+        self.KY2 = 1.25 * 1.114
 
-# Aerodynamic constants
+        # Aerodynamic constants
 
-Cmac = 0  # Moment coefficient about the aerodynamic centre [ ]
-CNwa = CLa  # Wing normal force slope [ ]
-CNha = 2 * np.pi * Ah / (Ah + 2)  # Stabiliser normal force slope [ ]
-depsda = 4 / (A + 2)  # Downwash gradient [ ]
+        self.Cmac = 0  # Moment coefficient about the aerodynamic centre [ ]
+        self.CNwa = self.CLa  # Wing normal force slope [ ]
+        self.CNha = 2 * np.pi * self.Ah / (self.Ah + 2)  # Stabiliser normal force slope [ ]
+        self.depsda = 4 / (self.A + 2)  # Downwash gradient [ ]
 
-# Lift and drag coefficient
+        # Lift and drag coefficient
 
-CL = 2 * W / (rho * V0 ** 2 * S)  # Lift coefficient [ ]
-CD = CD0 + (CLa * alpha0) ** 2 / (np.pi * A * e)  # Drag coefficient [ ]
+        self.CL = 2 * self.W / (self.rho * self.V0 ** 2 * self.S)  # Lift coefficient [ ]
+        self.CD = self.CD0 + (self.CLa * self.alpha0) ** 2 / (np.pi * self.A * self.e)  # Drag coefficient [ ]
 
-# Stabiblity derivatives
+        # Stabiblity derivatives
 
-CX0 = W * np.sin(th0) / (0.5 * rho * V0 ** 2 * S)
-CXu = -0.02792
-CXa = +0.47966  # Positive! (has been erroneously negative since 1993)
-CXadot = +0.08330
-CXq = -0.28170
-CXde = -0.03728
+        self.CX0 = self.W * np.sin(self.th0) / (0.5 * self.rho * self.V0 ** 2 * self.S)
+        self.CXu = -0.02792 #both large
+        self.CXa = +0.47966 # Positive! (has been erroneously negative since 1993) #both small
+        self.CXadot = +0.08330 #no effect
+        self.CXq = -0.28170 #no effect
+        self.CXde = -0.03728 #no effect
 
-CZ0 = -W * np.cos(th0) / (0.5 * rho * V0 ** 2 * S)
-CZu = -0.37616
-CZa = -5.74340
-CZadot = -0.00350
-CZq = -5.66290
-CZde = -0.69612
+        self.CZ0 = -self.W * np.cos(self.th0) / (0.5 * self.rho * self.V0 ** 2 * self.S)
+        self.CZu = -0.37616 #large diffrence
+        self.CZa = -5.74340
+        self.CZadot = -0.350 #factor 100
+        self.CZq = -5.66290
+        self.CZde = -0.69612
 
-Cmu = +0.06990
-Cmadot = +0.17800
-Cmq = -8.79415
+        self.Cmu = +0.06990
+        self.Cmadot = +0.17800
+        self.Cmq = -8.79415
 
-CYb = -0.7500
-CYbdot = 0
-CYp = -0.0304
-CYr = +0.8495
-CYda = -0.0400
-CYdr = +0.2300
+        self.CYb = -0.7500
+        self.CYbdot = 0
+        self.CYp = -0.0304
+        self.CYr = +0.8495
+        self.CYda = -0.0400
+        self.CYdr = +0.2300
 
-Clb = -0.10260
-Clp = -0.71085
-Clr = +0.23760
-Clda = -0.23088
-Cldr = +0.03440
+        self.Clb = -0.10260
+        self.Clp = -0.71085
+        self.Clr = +0.23760
+        self.Clda = -0.23088
+        self.Cldr = +0.03440
 
-Cnb = +0.1348
-Cnbdot = 0
-Cnp = -0.0602
-Cnr = -0.2061
-Cnda = -0.0120
-Cndr = -0.0939
+        self.Cnb = +0.1348
+        self.Cnbdot = 0
+        self.Cnp = -0.0602
+        self.Cnr = -0.2061
+        self.Cnda = -0.0120
+        self.Cndr = -0.0939
 
-#Pitch moment derivatives
-Cm_tc = -0.0064
+        #Pitch moment derivatives
+        self.Cm_tc = -0.0064
 
-#Engine characteristic diameter
-D = 0.5
+        #Engine characteristic diameter
+        self.D = 0.5

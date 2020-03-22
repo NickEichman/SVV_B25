@@ -3,22 +3,32 @@ import numpy as np
 import statespace as st
 import matplotlib.pyplot as plt
 import scipy.signal as ct
-import Cit_par as cs
+import Cit_par as cp
+import flight_data as fd
 
-sym =  False
+sym =  True
 a_sym = False
 
 if sym:
-    A_s,B_s,C_s,D_s = st.get_ss_symmetric()
+    
+    data,T = fd.get_data_eigen(1)
+    aoa = np.transpose(np.array(data[0]))[0]*np.pi/180
+    tas = np.transpose(np.array(data[1]))[0]
+    pitch = np.transpose(np.array(data[3]))[0]*np.pi/180
+    pitch_rate = np.transpose(np.array(data[6]))[0]*np.pi/180
+    uv = np.transpose(np.array(data[9]))[0]*np.pi/180
+    hp = np.transpose(np.array(data[11]))[0]*np.pi/180
+
+    cs = cp.Cit_par(aoa[0],hp[0],tas[0],pitch[0])
+
+    A_s,B_s,C_s,D_s = st.get_ss_symmetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_s = ct.lti(A_s,B_s,C_s,D_s)
-    T = np.linspace(0,10,101)
 
-    uv= np.zeros(np.shape(T))
-    for i in range(len(uv)):
-        uv[i] = -0.005
+    """plt.plot(aoa)
+    plt.plot(uv)
+    plt.show()"""
 
-
-    t1, y1, x1  = ct.lsim(sys_s,uv,T,[0,cs.alpha0,cs.th0,0])
+    t1, y1, x1  = ct.lsim(sys_s,uv,T,[0,aoa[0],pitch[0],pitch_rate[0]*cs.c/cs.V0])
     u=cs.V0*(y1[:,0]+1)
     alpha = y1[:,1]
     theta = y1[:,2]
@@ -47,24 +57,29 @@ if sym:
 
     plt.figure("TAS")
     plt.plot(T,u)
+    plt.plot(T,tas)
     plt.xlabel("time[s]")
     plt.ylabel("TAS [m/s]")
 
     plt.figure("AoA")
     plt.plot(T,alpha)
+    plt.plot(T,aoa)
     plt.xlabel("T[s]")
     plt.ylabel("AoA [rad]")
 
     plt.figure("flight path angle")
     plt.plot(T,theta)
+    plt.plot(T,pitch)
     plt.xlabel("T[s]")
     plt.ylabel("flight path angle [rad]")
 
     plt.figure("pitchrate ")
     plt.plot(T,q)
+    plt.plot(T,pitch_rate)
     plt.xlabel("T[s]")
     plt.ylabel("pitchrate [rad/s]")
 
+   
     plt.show()
 
 if a_sym:

@@ -1,7 +1,8 @@
-import Cit_par as cs
+import Cit_par as cp
 import numpy as np
 
-def get_ss_symmetric():
+def get_ss_symmetric(aoa0,hp0,Vel0,theta0):
+    cs = cp.Cit_par(aoa0,hp0,Vel0,theta0)
     # variable_vector [u,alpha,theta,q,de]
     # (forward velocity,angle of attack, pitchangle, ptichrate, elevator deflection)
     #implementation of the statespace matrices as defined in Lecture notes AE3202 March 2013
@@ -23,7 +24,8 @@ def get_ss_symmetric():
     D_s = np.zeros([4,1])
     return A_s, B_s, C_s, D_s
 
-def get_ss_assymetric():
+def get_ss_assymetric(aoa0,hp0,Vel0,theta0):
+    cs = cp.Cit_par(aoa0,hp0,Vel0,theta0)
     # variable_vector [beta,phi,p,r,da,dr]
     # (yaw angle,roll angle,rollrate, yawrate, aileron deflection,rudder deflection)
     #implementation of the statespace matrices as defined in Lecture notes AE3202 March 2013
