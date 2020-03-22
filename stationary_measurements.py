@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
+
 from scipy import stats
 
 import Cit_par as cessna
@@ -9,13 +10,69 @@ import subprocess
 import stationary_flight_data as flight_data
 import weight
 
+def get_r_2(y, y_fit):
+    mean = np.mean(y)
+    ss_tot = np.sum(np.power(y-mean, 2))
+    ss_reg = np.sum(np.power(y_fit-mean, 2))
+    return ss_reg/ss_tot
+
 
 def cl_curve(alpha, cn_alpha, alpha_0):
     return cn_alpha * alpha - cn_alpha * alpha_0
 
-
 def cd_curve(cl, cd_0, e):
     return cd_0 + np.power(cl, 2) / (np.pi * cessna.A * e)
+
+def plot_cl_alpha_curve(alpha, cn, cn_alpha, alpha_0):
+    y_fit = cl_curve(alpha, cn_alpha, alpha_0)
+    y = cn
+
+    r_2 = get_r_2(y, y_fit)
+    plt.plot(
+        np.degrees(alpha),
+        y_fit,
+        label=r"Linear fit $r^{2}$= " + str(round(r_2, 4)),
+    )
+    plt.scatter(
+        np.degrees(alpha),
+        y,
+        color="red",
+        label="Measured data",
+    )
+    plt.grid()
+    plt.ylabel(r"$C_{l}$ $[-]$", fontsize="x-large")
+    plt.xlabel(r"$\alpha$ $[^{\circ}]$", fontsize="x-large")
+    plt.legend(loc="best")
+    plt.show()
+
+
+def plot_cl_cd_curve(alpha, cn, cn_alpha, alpha_0):
+
+    y = cl_curve(alpha, cn_alpha, alpha_0)
+    x = cd_curve(cn, cd_0, e)
+
+    fit = np.polyfit(x, y, 2)
+
+    x_fit = np.linspace(x[0], x[-1])
+    y_fit = fit[0] * np.power(x_fit, 2) + fit[1] * x_fit + fit[2]
+
+    r_2 = get_r_2(y, fit[0] * np.power(x, 2) + fit[1] * x + fit[2])
+    plt.plot(
+        x_fit,
+        y_fit,
+        label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
+    )
+    plt.scatter(
+        x,
+        y,
+        color="red",
+        label="Measured data",
+    )
+    plt.grid()
+    plt.ylabel(r"$C_{l}$ $[-]$", fontsize="x-large")
+    plt.xlabel(r"$C_{d}$ $[-]$", fontsize="x-large")
+    plt.legend(loc="best")
+    plt.show()
 
 
 def get_cl_params(alpha, weight, height, true_airspeed):
@@ -175,7 +232,6 @@ def get_thrust_coefficient(height, thrust, velocity):
 
     return thrust / (density * np.power(velocity, 2) * np.power(cessna.D, 2))
 
-
 def plot_reduced_elevator_trim_curve(
     weight, height, thrust, standard_thrust, v_t, cm_delta, de_measured_trim
 ):
@@ -200,20 +256,25 @@ def plot_reduced_elevator_trim_curve(
     )
     v_fit = np.sort(reduced_velocity, axis=-1, kind="quicksort", order=None)
     de_fit = np.sort(reduced_elevator_deflection, axis=-1, kind="quicksort", order=None)
-    fit = np.polyfit(v_fit, de_fit, 2)
+    fit  = np.polyfit(v_fit, de_fit, 2)
+
+    r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2])
 
     plt.plot(
         v_fit,
         fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
-        label="polynomial curve fit",
+        label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2,4)),
     )
     plt.scatter(
         reduced_velocity,
         reduced_elevator_deflection,
         color="red",
-        label="measurement data",
+        label="Measured data",
     )
+    plt.grid()
     plt.gca().invert_yaxis()
+    plt.ylabel(r"$-\delta^{*}_{eq}$ $[rad]$", fontsize="x-large")
+    plt.xlabel(r"$\tilde{V}_{eq}$ $[\frac{m}{s}]$", fontsize="x-large")
     plt.legend(loc="best")
     plt.show()
 
@@ -232,11 +293,17 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
 
     v_fit = np.sort(reduced_velocity, axis=-1, kind="quicksort", order=None)
     de_fit = np.sort(reduced_force, axis=-1, kind="quicksort", order=None)
-    fit = np.polyfit(v_fit, de_fit, 1)
+    fit = np.polyfit(v_fit, de_fit, 2)
 
-    plt.plot(v_fit, fit[0] * v_fit + fit[1], label="polynomial curve fit")
-    plt.scatter(reduced_velocity, reduced_force, color="red", label="measurement data")
+    r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit,2) + fit[1]*v_fit + fit[2])
+
+
+    plt.plot(v_fit, fit[0] * np.power(v_fit,2) + fit[1]*v_fit + fit[2], label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2, 4)))
+    plt.grid()
+    plt.scatter(reduced_velocity, reduced_force, color="red", label="Measured data")
     plt.gca().invert_yaxis()
+    plt.ylabel(r"$-F^{*}_{e}$ $[rad]$", fontsize="x-large")
+    plt.xlabel(r"$\tilde{V}_{eq}$ $[\frac{m}{s}]$", fontsize="x-large")
     plt.legend(loc="best")
     plt.show()
 
@@ -327,9 +394,6 @@ cm_alpha, cm_delta = get_cm_derivatives(
     dd_dalpha,
 )
 
-print("cm_alpha = ", cm_alpha[0])
-print("cm_delta = ", cm_delta[0])
-
 # Stationary Measurement 2
 
 true_airspeed_sm2 = get_true_airspeed(
@@ -365,15 +429,17 @@ sm2_standard_thrust = (
     sm2_standard_thrust_per_engine[:, 0] + sm2_standard_thrust_per_engine[:, 1]
 )
 
-plot_elevator_force_control_curve(
-    flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
-)
-plot_reduced_elevator_trim_curve(
-    flight_data.sm2_weight,
-    flight_data.sm2_alt,
-    sm2_thrust,
-    sm2_standard_thrust,
-    true_airspeed_sm2,
-    cm_delta,
-    flight_data.sm2_delta_e,
-)
+# plot_elevator_force_control_curve(
+#     flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
+# )
+# plot_reduced_elevator_trim_curve(
+#     flight_data.sm2_weight,
+#     flight_data.sm2_alt,
+#     sm2_thrust,
+#     sm2_standard_thrust,
+#     true_airspeed_sm2,
+#     cm_delta,
+#     flight_data.sm2_delta_e,
+# )
+# plot_cl_alpha_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
+plot_cl_cd_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
