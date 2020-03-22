@@ -3,11 +3,11 @@ import scipy.io as scio
 
 ## Imports and slices input from the given flight data, in all of the eigenmotion flight sections
 # flight sections
-short_period_time_start = 31200
-short_period_time_end = 31800
+short_period_time_start = 31495#31200
+short_period_time_end = 31560#31800
 
-phugoid_time_start = 31800
-phugoid_time_end = 34200
+phugoid_time_start = 32240#31800
+phugoid_time_end = 33930#
 
 dutch_roll_time_start = 34200
 dutch_roll_time_end = 34800
@@ -112,6 +112,6 @@ def get_data_eigen(n):
     aileron_def = delta_a[start:end]
     elevator_def = delta_e[start:end]
     rudder_def = delta_r[start:end]
-
-    return aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, elevator_trim, aileron_def, elevator_def, \
-           rudder_def
+    time = np.arange(0,(end-start)*0.1,0.1)
+    
+    return [aoa, tas, roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate, aileron_def, elevator_def, rudder_def],time
