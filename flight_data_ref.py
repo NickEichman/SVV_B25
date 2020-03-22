@@ -80,7 +80,7 @@ totalfuelflow = lh_engine_fmf+rh_engine_fmf
 # Function to get all pertaining data for the eigenmotions. n is the eigenmotion chosen, 0 is short period, 1 phugoid,
 # 2 dutch roll, 3 dutch roll yaw dampening, 4 aperiodic roll and 5 spiral. Returns the following numpy arrays, in order:
 # Angle of attack, true air speed, roll angle, pitch angle, yaw angle? it is not certain what it is from the matlab file
-# roll rate, pitch rate, yaw rate, elevator trim deflection, aileron deflection, elevator deflection, rudder deflection
+# roll rate, pitch rate, yaw rate, aileron deflection, elevator deflection, rudder deflection and pressure altitude
 def get_data_eigen(n):
     if n == 0:
         start = short_period_time_start
