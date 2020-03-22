@@ -45,6 +45,33 @@ def plot_cl_alpha_curve(alpha, cn, cn_alpha, alpha_0):
     plt.legend(loc="best")
     plt.show()
 
+def plot_cd_alpha_curve(alpha, cn):
+    x = alpha
+    y = cd_curve(cn, cd_0, e)
+
+    fit = np.polyfit(x, y, 2)
+
+    x_fit = np.linspace(x[0], x[-1])
+    y_fit = fit[0] * np.power(x_fit, 2) + fit[1] * x_fit + fit[2]
+
+    r_2 = get_r_2(y, fit[0] * np.power(x, 2) + fit[1] * x + fit[2])
+    plt.plot(
+        np.degrees(x_fit),
+        y_fit,
+        label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
+    )
+    plt.scatter(
+        np.degrees(x),
+        y,
+        color="red",
+        label="Measured data",
+    )
+    plt.grid()
+    plt.ylabel(r"$C_{d}$ $[-]$", fontsize="x-large")
+    plt.xlabel(r"$\alpha$ $[^{\circ}]$", fontsize="x-large")
+    plt.legend(loc="best")
+    plt.show()
+
 
 def plot_cl_cd_curve(alpha, cn, cn_alpha, alpha_0):
 
@@ -381,6 +408,10 @@ cd_0, e, cd = get_cd_params(
     sm1_thrust,
 )
 
+print("cl_alpha = ", round(cl_alpha,3))
+print("cd_0 = ", round(cd_0,3))
+print("e = ", round(e,3))
+
 # Stationary Measurement 3
 
 sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0] * flight_data.sm3_weight[0]
@@ -443,7 +474,7 @@ sm2_standard_thrust = (
 
 
 # Plotting 
-"""
+
 plot_elevator_force_control_curve(
      flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
  )
@@ -458,7 +489,7 @@ plot_reduced_elevator_trim_curve(
  )
 plot_cl_alpha_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
 plot_cl_cd_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
-"""
+plot_cd_alpha_curve(flight_data.sm1_alpha, cn)
 
 
 if __name__=="__main__":
