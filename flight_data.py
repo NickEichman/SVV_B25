@@ -18,7 +18,7 @@ dutch_roll_YD_time_start = 34800
 dutch_roll_YD_time_end = 36000
 
 aperiodic_roll_time_start = 36000
-aperiodic_roll_time_end = 36600
+aperiodic_roll_time_end = 36070
 
 spiral_time_start = 36600
 spiral_time_end = 37800  # Guesstimate

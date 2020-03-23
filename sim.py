@@ -23,9 +23,9 @@ if sym:
     A_s,B_s,C_s,D_s = st.get_ss_symmetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_s = ct.lti(A_s,B_s,C_s,D_s)
 
-    """plt.plot(aoa)
+    plt.plot(aoa)
     plt.plot(uv)
-    plt.show()"""
+    plt.show()
 
     t1, y1, x1  = ct.lsim(sys_s,uv,T,[0,aoa[0],pitch[0],pitch_rate[0]])
     u=cs.V0*(y1[:,0]+1)
@@ -83,7 +83,7 @@ if sym:
 
 if a_sym:
     
-    data,T = fd.get_data_eigen(5)
+    data,T = fd.get_data_eigen(2)
 
     aoa = np.transpose(np.array(data[0]))[0]*np.pi/180
     tas = np.transpose(np.array(data[1]))[0]
@@ -100,10 +100,11 @@ if a_sym:
 
     A_a,B_a,C_a,D_a = st.get_ss_assymetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_a = ct.lti(A_a,B_a,C_a,D_a)
-    
+    """
     #plt.plot(aoa)
     plt.plot(np.transpose(uv)[0])
-    plt.show()
+    plt.plot(np.transpose(uv)[1])
+    plt.show()"""
 
     t1, y1, x1  = ct.lsim(sys_a,uv,T,[yaw[0],roll[0],yaw_rate[0],roll_rate[0]])
 
@@ -113,9 +114,9 @@ if a_sym:
     r = y1[:,3]*cs.V0/(2*cs.b)
 
     eig_a = np.linalg.eig(A_a)[0]
-    T12 = -0.693/(np.real(eig_a))*cs.c/cs.V0
-    omega_0 = np.sqrt(np.real(eig_a)**2+np.imag(eig_a)**2)*cs.V0/cs.c
-    P = 2*np.pi/np.imag(eig_a)*cs.c/cs.V0
+    T12 = -0.693/(np.real(eig_a))
+    omega_0 = np.sqrt(np.real(eig_a)**2+np.imag(eig_a)**2)
+    P = 2*np.pi/np.imag(eig_a)
     damp = -np.real(eig_a)/np.sqrt(np.real(eig_a)**2+np.imag(eig_a)**2)
 
     print("A matrix for asymmetric:")

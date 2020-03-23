@@ -103,18 +103,18 @@ class Cit_par:
         self.CYda = -0.0400
         self.CYdr = +0.2300
 
-        self.Clb = -0.10260*1.2 #dampening
-        self.Clp = -0.71085*0.6 #scale yaw
-        self.Clr = +0.23760*0.1 #light frequence
-        self.Clda = -0.23088 #roll offset
+        self.Clb = -0.10260#dampening
+        self.Clp = -0.71085#scale yaw
+        self.Clr = +0.23760 #light frequence
+        self.Clda = -0.23088#roll offset
         self.Cldr = +0.03440 #initial peak
 
-        self.Cnb = +0.1348*0.12#amplitude
+        self.Cnb = +0.1348*0.25#amplitude
         self.Cnbdot = 0
-        self.Cnp = -0.0602*0.4
-        self.Cnr = -0.2061*0.4 #frequency roll
+        self.Cnp = -0.0602
+        self.Cnr = -0.2061 *0.2#frequency roll
         self.Cnda = -0.0120*0.1
-        self.Cndr = -0.0939*0.3 #scale both
+        self.Cndr = -0.0939 #scale both
 
         #Pitch moment derivatives
         self.Cm_tc = -0.0064
