@@ -409,6 +409,7 @@ cd_0, e, cd = get_cd_params(
 print("cl_alpha = ", round(cl_alpha,3))
 print("cd_0 = ", round(cd_0,3))
 print("e = ", round(e,3))
+print("alpha_0 = ", round(alpha_0,3))
 
 # Stationary Measurement 3
 
@@ -520,8 +521,11 @@ if __name__=="__main__":
     Increase Fuel used and assess impact on cm_alpha and cm_delta. Both should become less negative as cg moves aft 
     Reducing ampunt of fuel moves cg forward
     """
+    cg1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]
 
     flight_data.sm3_F_used *= 1.5
+
+    cg2 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]
 
     sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0] * flight_data.sm3_weight[0]
     sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1] * flight_data.sm3_weight[1]
@@ -537,7 +541,32 @@ if __name__=="__main__":
         dd_dalpha,
     )
 
+    print("change in cg = ", round(cg1-cg2,3), " m")
     print("modified cm_alpha = ", cm_alpha_new)
     print("modified cm_delta = ", cm_delta_new)
 
     assert cm_alpha_new < cm_alpha[0], "cm_alpha is not reducing with a foward shift in cg"
+
+    """
+    Test 3:
+    Assess if calculated Mach number is equal to Mach number calculated by hand (0.312) for 100 m/s CAS and 1000m height.
+    """
+    np.testing.assert_almost_equal(get_mach_number(1000, 100),0.312,3, "Incorrect conversion to Mach number")
+
+    """
+    Test 4:
+    Assess if true airspeed is equal to true airspeed calculated by hand (104.836) for 1000m height, 287.12 measured tempearture and 100 m/s CAS
+    """
+    np.testing.assert_almost_equal(get_true_airspeed(1000,287.12,100), 104.836,2, "Incorrect conversion to True Airspeed")
+
+    """
+    Test 5:
+    Assess if reduced equivalent airspeed is equal to reduced equivalent airspeed calculated by hand(776.886) with weight of 1000N, height of 1000m and 104.82622 TAS.
+    """
+    np.testing.assert_almost_equal(get_reduced_equivalent_airspeed(1000, 1000, 104.82622864721496), 776.88, 2, "Incorrect conversion to reduced Equivalent Airspeed")
+
+    """
+    Test 6:
+    Assess if R^2 function will yield 1 in case of perfect fit
+    """
+    np.testing.assert_almost_equal(get_r_2(np.array([1,2,3,4,5,6]), np.array([1,2,3,4,5,6])), 1, err_msg="R2 value not equal to 1 for perfect fir")
