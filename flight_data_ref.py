@@ -5,13 +5,13 @@ import scipy.io as scio
 # flight sections
 
 phugoid_time_start = 32370
-phugoid_time_end = 35500
+phugoid_time_end = 34430
 
 aperiodic_roll_time_start = 35500
 aperiodic_roll_time_end = 36350
 
 short_period_time_start = 36350
-short_period_time_end = 37170
+short_period_time_end = 36467
 
 dutch_roll_time_start = 37170
 dutch_roll_time_end = 37670
