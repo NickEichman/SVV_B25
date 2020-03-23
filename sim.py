@@ -6,8 +6,8 @@ import scipy.signal as ct
 import Cit_par as cp
 import flight_data as fd
 
-sym =  True
-a_sym = False
+sym =  False
+a_sym = True
 
 if sym:
     
@@ -16,9 +16,8 @@ if sym:
     tas = np.transpose(np.array(data[1]))[0]
     pitch = np.transpose(np.array(data[3]))[0]*np.pi/180
     pitch_rate = np.transpose(np.array(data[6]))[0]*np.pi/180
-    uv = np.transpose(np.array(data[9]))[0]*np.pi/180
+    uv = np.transpose(np.array(data[9]))[0]*np.pi/180-0.0805
     hp = np.transpose(np.array(data[11]))[0]*np.pi/180
-
     cs = cp.Cit_par(aoa[0],hp[0],tas[0],pitch[0])
 
     A_s,B_s,C_s,D_s = st.get_ss_symmetric(aoa[0],hp[0],tas[0],pitch[0])
@@ -28,7 +27,7 @@ if sym:
     plt.plot(uv)
     plt.show()"""
 
-    t1, y1, x1  = ct.lsim(sys_s,uv,T,[0,aoa[0],pitch[0],pitch_rate[0]*cs.c/cs.V0])
+    t1, y1, x1  = ct.lsim(sys_s,uv,T,[0,aoa[0],pitch[0],pitch_rate[0]])
     u=cs.V0*(y1[:,0]+1)
     alpha = y1[:,1]
     theta = y1[:,2]
@@ -83,15 +82,30 @@ if sym:
     plt.show()
 
 if a_sym:
-    A_a,B_a,C_a,D_a = st.get_ss_assymetric()
+    
+    data,T = fd.get_data_eigen(5)
+
+    aoa = np.transpose(np.array(data[0]))[0]*np.pi/180
+    tas = np.transpose(np.array(data[1]))[0]
+    pitch = np.transpose(np.array(data[3]))[0]*np.pi/180
+    roll = np.transpose(np.array(data[2]))[0]*np.pi/180
+    yaw = np.transpose(np.array(data[4]))[0]
+    roll_rate = np.transpose(np.array(data[5]))[0]*np.pi/180
+    yaw_rate = np.transpose(np.array(data[7]))[0]*np.pi/180
+    uv = np.transpose([np.transpose(np.array(data[8]))[0]*np.pi/180,np.transpose(np.array(data[10]))[0]*np.pi/180])
+    hp = np.transpose(np.array(data[11]))[0]*np.pi/180
+
+    cs = cp.Cit_par(aoa[0],hp[0],tas[0],pitch[0])
+
+
+    A_a,B_a,C_a,D_a = st.get_ss_assymetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_a = ct.lti(A_a,B_a,C_a,D_a)
-    T = np.linspace(0,15,101)
+    
+    #plt.plot(aoa)
+    plt.plot(np.transpose(uv)[0])
+    plt.show()
 
-    uv= np.zeros([np.shape(T)[0],2])
-    for i in range(len(uv)):
-        uv[i,1] = 0.025
-
-    t1, y1, x1  = ct.lsim(sys_a,uv,T,[0,0,0,0])
+    t1, y1, x1  = ct.lsim(sys_a,uv,T,[yaw[0],roll[0],yaw_rate[0],roll_rate[0]])
 
     beta = y1[:,0]
     phi = y1[:,1]
@@ -121,21 +135,25 @@ if a_sym:
 
     plt.figure("Yaw angle/rudder")
     plt.plot(T,beta)
+    plt.plot(T,yaw)
     plt.xlabel("time[s]")
     plt.ylabel("Yaw [rad]")
 
     plt.figure("roll angle/rudder")
     plt.plot(T,phi)
+    plt.plot(T,roll)
     plt.xlabel("T[s]")
     plt.ylabel("roll [rad]")
 
     plt.figure("Yaw rate/rudder")
     plt.plot(T,p)
+    plt.plot(T,yaw_rate)
     plt.xlabel("T[s]")
     plt.ylabel("yaw rate [rad/s]")
 
     plt.figure("roll rate/rudder ")
     plt.plot(T,r)
+    plt.plot(T,roll_rate)
     plt.xlabel("T[s]")
     plt.ylabel("roll rate [rad/s]")
 

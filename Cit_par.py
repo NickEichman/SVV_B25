@@ -22,8 +22,8 @@ class Cit_par:
 
         # Longitudinal stability
 
-        self.Cma = -0.63388  # longitudinal stabilty [ ]
-        self.Cmde = -1.39711  # elevator effectiveness [ ]
+        self.Cma = -0.63388 # longitudinal stabilty [ ]
+        self.Cmde = -1.39711   # elevator effectiveness [ ]
 
         # Aircraft geometry
 
@@ -76,18 +76,21 @@ class Cit_par:
         # Stabiblity derivatives
 
         self.CX0 = self.W * np.sin(self.th0) / (0.5 * self.rho * self.V0 ** 2 * self.S)
-        self.CXu = -0.02792 #both large
-        self.CXa = +0.47966 # Positive! (has been erroneously negative since 1993) #both small
+        print(self.CX0)
+        self.CXu = -0.02792*2.6#both large
+        self.CXa = +0.47966# Positive! (has been erroneously negative since 1993) #both small
         self.CXadot = +0.08330 #no effect
         self.CXq = -0.28170 #no effect
         self.CXde = -0.03728 #no effect
 
         self.CZ0 = -self.W * np.cos(self.th0) / (0.5 * self.rho * self.V0 ** 2 * self.S)
-        self.CZu = -0.37616 #large diffrence
+        print(self.CZ0)
+        self.CZu = -0.376160#large diffrence
         self.CZa = -5.74340
-        self.CZadot = -0.350 #factor 100
+        self.CZadot = -0.00350 #factor 100
         self.CZq = -5.66290
         self.CZde = -0.69612
+ 
 
         self.Cmu = +0.06990
         self.Cmadot = +0.17800
@@ -100,18 +103,18 @@ class Cit_par:
         self.CYda = -0.0400
         self.CYdr = +0.2300
 
-        self.Clb = -0.10260
-        self.Clp = -0.71085
-        self.Clr = +0.23760
-        self.Clda = -0.23088
-        self.Cldr = +0.03440
+        self.Clb = -0.10260*1.2 #dampening
+        self.Clp = -0.71085*0.6 #scale yaw
+        self.Clr = +0.23760*0.1 #light frequence
+        self.Clda = -0.23088 #roll offset
+        self.Cldr = +0.03440 #initial peak
 
-        self.Cnb = +0.1348
+        self.Cnb = +0.1348*0.12#amplitude
         self.Cnbdot = 0
-        self.Cnp = -0.0602
-        self.Cnr = -0.2061
-        self.Cnda = -0.0120
-        self.Cndr = -0.0939
+        self.Cnp = -0.0602*0.4
+        self.Cnr = -0.2061*0.4 #frequency roll
+        self.Cnda = -0.0120*0.1
+        self.Cndr = -0.0939*0.3 #scale both
 
         #Pitch moment derivatives
         self.Cm_tc = -0.0064

@@ -11,7 +11,7 @@ short_period_time_end = 31560  # Original: 31800
 phugoid_time_start = 32240  # Original: 31800
 phugoid_time_end = 33930
 
-dutch_roll_time_start = 34200
+dutch_roll_time_start = 34680
 dutch_roll_time_end = 34800
 
 dutch_roll_YD_time_start = 34800
