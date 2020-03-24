@@ -4,23 +4,23 @@ import scipy.io as scio
 ## Imports and slices input from the reference flight data, in all of the eigenmotion flight sections
 # flight sections
 
-phugoid_time_start = 32370
+phugoid_time_start = 32370                  # Time stamps varified 
 phugoid_time_end = 34430
 
-aperiodic_roll_time_start = 35500
-aperiodic_roll_time_end = 36350
+aperiodic_roll_time_start = 35500 + 390     # Time stamps varified 
+aperiodic_roll_time_end = 36350 
 
-short_period_time_start = 36350
-short_period_time_end = 36467
+short_period_time_start = 36350             # Time stamps varified 
+short_period_time_end = 36467-67
 
-dutch_roll_time_start = 37170
-dutch_roll_time_end = 37670
+dutch_roll_time_start = 37170 + 403         # Time stamps varified
+dutch_roll_time_end = 37670 + 50 
 
-dutch_roll_YD_time_start = 37670
-dutch_roll_YD_time_end = 39200
+dutch_roll_YD_time_start = 37670 - 100      # Time stamps varified 
+dutch_roll_YD_time_end = 39200 - 1200
 
-spiral_time_start = 39200
-spiral_time_end = 41000  # Guesstimate
+spiral_time_start = 39200                   # Time stamps varified 
+spiral_time_end = 41000 - 1000  
 
 # lh stands for left engine, engine 1
 # rh stands for right engine, engine 2
@@ -76,7 +76,7 @@ time                  = np.array(input_file['flightdata'][0][0][47][0][0][0])  #
 length_array          = np.arange(0, len(vane_aoa))                                # For plotting purposes
 totalfuelflow = lh_engine_fmf+rh_engine_fmf
 
-
+print(len(vane_aoa))
 # Function to get all pertaining data for the eigenmotions. n is the eigenmotion chosen, 0 is short period, 1 phugoid,
 # 2 dutch roll, 3 dutch roll yaw dampening, 4 aperiodic roll and 5 spiral. Returns the following numpy arrays, in order:
 # Angle of attack, true air speed, roll angle, pitch angle, yaw angle? it is not certain what it is from the matlab file
