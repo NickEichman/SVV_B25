@@ -8,9 +8,9 @@ phugoid_time_start = 32370                  # Time stamps varified
 phugoid_time_end = 34430
 
 aperiodic_roll_time_start = 35500 + 390     # Time stamps varified 
-aperiodic_roll_time_end = 36350 
+aperiodic_roll_time_end = 36350 -100
 
-short_period_time_start = 36350             # Time stamps varified 
+short_period_time_start = 36350 - 102       # Time stamps varified 
 short_period_time_end = 36467-67
 
 dutch_roll_time_start = 37170 + 403         # Time stamps varified
@@ -20,7 +20,7 @@ dutch_roll_YD_time_start = 37670 - 100      # Time stamps varified
 dutch_roll_YD_time_end = 39200 - 1200
 
 spiral_time_start = 39200                   # Time stamps varified 
-spiral_time_end = 41000 - 1000  
+spiral_time_end = 41000 - 1200  
 
 # lh stands for left engine, engine 1
 # rh stands for right engine, engine 2
