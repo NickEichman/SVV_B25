@@ -6,20 +6,20 @@ import scipy.signal as ct
 import Cit_par as cp
 import flight_data as fd
 
-sym =  False
-a_sym = True
+sym =  True
+a_sym = False
 
 if sym:
     
-    data,T = fd.get_data_eigen(1)
+    data,T = fd.get_data_eigen(0)
     aoa = np.transpose(np.array(data[0]))[0]*np.pi/180
     tas = np.transpose(np.array(data[1]))[0]
     pitch = np.transpose(np.array(data[3]))[0]*np.pi/180
     pitch_rate = np.transpose(np.array(data[6]))[0]*np.pi/180
-    uv = np.transpose(np.array(data[9]))[0]*np.pi/180-0.0805
+    uv = np.transpose(np.array(data[9]))[0]*np.pi/180
     hp = np.transpose(np.array(data[11]))[0]*np.pi/180
     cs = cp.Cit_par(aoa[0],hp[0],tas[0],pitch[0])
-
+    print(pitch[0])
     A_s,B_s,C_s,D_s = st.get_ss_symmetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_s = ct.lti(A_s,B_s,C_s,D_s)
 
@@ -55,35 +55,38 @@ if sym:
     print(damp)
 
     plt.figure("TAS")
-    plt.plot(T,u)
-    plt.plot(T,tas)
+    plt.plot(T,u,label="simulated")
+    plt.plot(T,tas,label="flight")
     plt.xlabel("time[s]")
     plt.ylabel("TAS [m/s]")
+    plt.legend()
 
     plt.figure("AoA")
-    plt.plot(T,alpha)
-    plt.plot(T,aoa)
+    plt.plot(T,alpha,label="simulated")
+    plt.plot(T,aoa,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("AoA [rad]")
+    plt.legend()
 
     plt.figure("flight path angle")
-    plt.plot(T,theta)
-    plt.plot(T,pitch)
+    plt.plot(T,theta,label="simulated")
+    plt.plot(T,pitch,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("flight path angle [rad]")
+    plt.legend()
 
     plt.figure("pitchrate ")
-    plt.plot(T,q)
-    plt.plot(T,pitch_rate)
+    plt.plot(T,q,label="simulated")
+    plt.plot(T,pitch_rate,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("pitchrate [rad/s]")
+    plt.legend()
 
-   
     plt.show()
 
 if a_sym:
     
-    data,T = fd.get_data_eigen(2)
+    data,T = fd.get_data_eigen(5)
 
     aoa = np.transpose(np.array(data[0]))[0]*np.pi/180
     tas = np.transpose(np.array(data[1]))[0]
@@ -100,11 +103,11 @@ if a_sym:
 
     A_a,B_a,C_a,D_a = st.get_ss_assymetric(aoa[0],hp[0],tas[0],pitch[0])
     sys_a = ct.lti(A_a,B_a,C_a,D_a)
-    """
+    
     #plt.plot(aoa)
     plt.plot(np.transpose(uv)[0])
     plt.plot(np.transpose(uv)[1])
-    plt.show()"""
+    plt.show()
 
     t1, y1, x1  = ct.lsim(sys_a,uv,T,[yaw[0],roll[0],yaw_rate[0],roll_rate[0]])
 
@@ -134,28 +137,32 @@ if a_sym:
     print("dampening ration for asymmetric")
     print(damp)
 
-    plt.figure("Yaw angle/rudder")
-    plt.plot(T,beta)
-    plt.plot(T,yaw)
+    plt.figure("Yaw_angle")
+    plt.plot(T,beta,label="simulated")
+    plt.plot(T,yaw,label="flight")
     plt.xlabel("time[s]")
     plt.ylabel("Yaw [rad]")
+    plt.legend()
 
-    plt.figure("roll angle/rudder")
-    plt.plot(T,phi)
-    plt.plot(T,roll)
+    plt.figure("roll_angle")
+    plt.plot(T,phi,label="simulated")
+    plt.plot(T,roll,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("roll [rad]")
+    plt.legend()
 
-    plt.figure("Yaw rate/rudder")
-    plt.plot(T,p)
-    plt.plot(T,yaw_rate)
+    plt.figure("Yaw_rate")
+    plt.plot(T,p,label="simulated")
+    plt.plot(T,yaw_rate,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("yaw rate [rad/s]")
+    plt.legend()
 
-    plt.figure("roll rate/rudder ")
-    plt.plot(T,r)
-    plt.plot(T,roll_rate)
+    plt.figure("roll_rate")
+    plt.plot(T,r,label="simulated")
+    plt.plot(T,roll_rate,label="flight")
     plt.xlabel("T[s]")
     plt.ylabel("roll rate [rad/s]")
+    plt.legend()
 
     plt.show()
