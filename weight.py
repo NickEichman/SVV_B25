@@ -10,19 +10,19 @@ aftcabinmass =0
 aftcabinmass2 =0
 wingjackmass =0
 mass_cargo =0
-mass_seat1=95
-mass_seat2 =92
+mass_seat1=102
+mass_seat2 =80
 mass_baggage =0
-mass_seat3 =74
-mass_seat4 =66
-mass_seat5 =61
-mass_seat6 =75
-mass_seat7 =78
-mass_seat8 =86
-mass_seat10 =68 #coordinator
+mass_seat3 =76
+mass_seat4 =75
+mass_seat5 =60
+mass_seat6 =80
+mass_seat7 =71
+mass_seat8 =105
+mass_seat10 =76 #coordinator
 payloadmass = (mass_seat1+mass_seat2+mass_seat3+mass_seat4+mass_seat5+mass_seat6+mass_seat7+mass_seat8+mass_seat10+nosebaggagemass+aftcabinmass+aftcabinmass2)
-ramp_mass = (bem + payloadmass + 4050*0.453592)
-f_used = [360,412,447,478,532,570,664,694,730,755,798,825,846,881,910]
+ramp_mass = (bem + payloadmass + 4100*0.453592)
+f_used = [361,408,440,481,525,555,627,650,671,688,717,773,791,820,852]
 f_dummy = [350]
 #xcgdatum and xcg function calculations
 #xcg positions of all components [INCHES]
@@ -66,18 +66,18 @@ def fuel_to_cg(fuel_used):
     xcg = []
     current_weight = []
     for i in range(len(fuel_used)):
-        current_fuel = 4050 - fuel_used[i]
+        current_fuel = 4100 - fuel_used[i]
         current_weight.append(ramp_mass - fuel_used[i]*0.453592)
         currentcmfuel = np.interp(current_fuel, fuel_mass, Cmfuel)
         cmtotal.append((Cmbem + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms8 + Cms10 + Cmcab1 + Cmcab2 + Cmnose)*9.81 + currentcmfuel*0.113*100)  # Current aircraft Cm)
         xcg.append(cmtotal[i] /( current_weight[i]*9.81))
-        if fuel_used[i] == 881: #Value has to correspond to measurement time of c.g. shift
+        if fuel_used[i] == 350: #Value has to correspond to measurement time of c.g. shift
             cmtotal.append((Cmbem + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms9 + Cms10 + Cmcab1 + Cmcab2 + Cmnose)*9.81 + currentcmfuel*0.113*100)
             xcg.append(cmtotal[-1] / (current_weight[i]*9.81))
-        if fuel_used[i] == 910:
+        if fuel_used[i] == 852:
             cmtotal.append((Cmbem + Cms1 + Cms2 + Cms3 + Cms4 + Cms5 + Cms6 + Cms7 + Cms9 + Cms10 + Cmcab1 + Cmcab2 + Cmnose)*9.81 + currentcmfuel*0.113*100)
             xcg.append(cmtotal[-1] / (current_weight[i]*9.81))
     return xcg, cmtotal, current_weight
-#test_case for 350 pounds of fuel used, x_cg should be at 7.436 with non-shifted cg and 7.376 for shifted, use f_dummy input
+#test_case for 350 pounds of fuel used, x_cg should be at 7.14699 with non-shifted cg and 7.09108 for shifted, use f_dummy input
 #actually should be around 7 meters    
 
