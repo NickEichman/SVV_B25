@@ -10,18 +10,21 @@ import subprocess
 import stationary_flight_data as flight_data
 import weight
 
+
 def get_r_2(y, y_fit):
     mean = np.mean(y)
-    ss_tot = np.sum(np.power(y-mean, 2))
-    ss_reg = np.sum(np.power(y_fit-mean, 2))
-    return ss_reg/ss_tot
+    ss_tot = np.sum(np.power(y - mean, 2))
+    ss_reg = np.sum(np.power(y_fit - mean, 2))
+    return ss_reg / ss_tot
 
 
 def cl_curve(alpha, cn_alpha, alpha_0):
     return cn_alpha * alpha - cn_alpha * alpha_0
 
+
 def cd_curve(cl, cd_0, e):
     return cd_0 + np.power(cl, 2) / (np.pi * cessna.A * e)
+
 
 def plot_cl_alpha_curve(alpha, cn, cn_alpha, alpha_0):
     y_fit = cl_curve(alpha, cn_alpha, alpha_0)
@@ -29,21 +32,17 @@ def plot_cl_alpha_curve(alpha, cn, cn_alpha, alpha_0):
 
     r_2 = get_r_2(y, y_fit)
     plt.plot(
-        np.degrees(alpha),
-        y_fit,
-        label=r"Linear fit $r^{2}$= " + str(round(r_2, 4)),
+        np.degrees(alpha), y_fit, label=r"Linear fit $r^{2}$= " + str(round(r_2, 4)),
     )
     plt.scatter(
-        np.degrees(alpha),
-        y,
-        color="red",
-        label="Measured data",
+        np.degrees(alpha), y, color="red", label="Measured data",
     )
     plt.grid()
     plt.ylabel(r"$C_{l}$ $[-]$", fontsize="x-large")
     plt.xlabel(r"$\alpha$ $[^{\circ}]$", fontsize="x-large")
     plt.legend(loc="best")
     plt.show()
+
 
 def plot_cd_alpha_curve(alpha, cn):
     x = alpha
@@ -61,10 +60,7 @@ def plot_cd_alpha_curve(alpha, cn):
         label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
     )
     plt.scatter(
-        np.degrees(x),
-        y,
-        color="red",
-        label="Measured data",
+        np.degrees(x), y, color="red", label="Measured data",
     )
     plt.grid()
     plt.ylabel(r"$C_{d}$ $[-]$", fontsize="x-large")
@@ -90,10 +86,7 @@ def plot_cl_cd_curve(alpha, cn, cn_alpha, alpha_0):
         label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
     )
     plt.scatter(
-        x,
-        y,
-        color="red",
-        label="Measured data",
+        x, y, color="red", label="Measured data",
     )
     plt.grid()
     plt.ylabel(r"$C_{l}$ $[-]$", fontsize="x-large")
@@ -257,8 +250,9 @@ def get_thrust_coefficient(height, thrust, velocity):
 
     return thrust / (density * np.power(velocity, 2) * np.power(cessna.D, 2))
 
+
 def plot_reduced_elevator_trim_curve(
-    weight, height, thrust, standard_thrust, v_t, cm_delta, de_measured_trim, test = False
+    weight, height, thrust, standard_thrust, v_t, cm_delta, de_measured_trim, test=False
 ):
     """
 
@@ -281,7 +275,7 @@ def plot_reduced_elevator_trim_curve(
     )
     v_fit = np.sort(reduced_velocity, axis=-1, kind="quicksort", order=None)
     de_fit = np.sort(reduced_elevator_deflection, axis=-1, kind="quicksort", order=None)
-    fit  = np.polyfit(v_fit, de_fit, 2)
+    fit = np.polyfit(v_fit, de_fit, 2)
 
     r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2])
 
@@ -289,7 +283,7 @@ def plot_reduced_elevator_trim_curve(
         plt.plot(
             v_fit,
             fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
-            label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2,4)),
+            label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
         )
         plt.scatter(
             reduced_velocity,
@@ -301,7 +295,7 @@ def plot_reduced_elevator_trim_curve(
         plt.plot(
             v_fit,
             fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
-            label=r"cm_delta = "+str(round(cm_delta[0], 3)),
+            label=r"cm_delta = " + str(round(cm_delta[0], 3)),
         )
 
     plt.grid()
@@ -329,17 +323,20 @@ def plot_elevator_force_control_curve(weight, height, v_t, f_e):
     de_fit = np.sort(reduced_force, axis=-1, kind="quicksort", order=None)
     fit = np.polyfit(v_fit, de_fit, 2)
 
-    r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit,2) + fit[1]*v_fit + fit[2])
+    r_2 = get_r_2(de_fit, fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2])
 
-
-    plt.plot(v_fit, fit[0] * np.power(v_fit,2) + fit[1]*v_fit + fit[2], label=r"Second order polynomial fit $r^{2}$= "+str(round(r_2, 4)))
+    plt.plot(
+        v_fit,
+        fit[0] * np.power(v_fit, 2) + fit[1] * v_fit + fit[2],
+        label=r"Second order polynomial fit $r^{2}$= " + str(round(r_2, 4)),
+    )
     plt.grid()
     plt.scatter(reduced_velocity, reduced_force, color="red", label="Measured data")
     plt.gca().invert_yaxis()
     plt.ylabel(r"$-F^{*}_{e}$ $[rad]$", fontsize="x-large")
     plt.xlabel(r"$\tilde{V}_{eq}$ $[\frac{m}{s}]$", fontsize="x-large")
     plt.legend(loc="best")
-   
+
     plt.show()
 
 
@@ -406,10 +403,10 @@ cd_0, e, cd = get_cd_params(
     sm1_thrust,
 )
 
-print("cl_alpha = ", round(cl_alpha,3))
-print("cd_0 = ", round(cd_0,3))
-print("e = ", round(e,3))
-print("alpha_0 = ", round(alpha_0,3))
+print("cl_alpha = ", round(cl_alpha, 3))
+print("cd_0 = ", round(cd_0, 3))
+print("e = ", round(e, 3))
+print("alpha_0 = ", round(alpha_0, 3))
 
 # Stationary Measurement 3
 
@@ -472,48 +469,58 @@ sm2_standard_thrust = (
 )
 
 
-# Plotting 
+# Plotting
 
 plot_elevator_force_control_curve(
-     flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
- )
+    flight_data.sm2_weight, flight_data.sm2_alt, true_airspeed_sm2, flight_data.sm2_Fe
+)
 plot_reduced_elevator_trim_curve(
-     flight_data.sm2_weight,
-     flight_data.sm2_alt,
-     sm2_thrust,
-     sm2_standard_thrust,
-     true_airspeed_sm2,
-     cm_delta,
-     flight_data.sm2_delta_e,
- )
+    flight_data.sm2_weight,
+    flight_data.sm2_alt,
+    sm2_thrust,
+    sm2_standard_thrust,
+    true_airspeed_sm2,
+    cm_delta,
+    flight_data.sm2_delta_e,
+)
 plot_cl_alpha_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
 plot_cl_cd_curve(flight_data.sm1_alpha, cn, cl_alpha, alpha_0)
 plot_cd_alpha_curve(flight_data.sm1_alpha, cn)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     """
     Test 1:
     Moving cg aft reduces slope of cm_alpha. Test 1 assesses impact on trim curves when moving cg aft 
     The elevator deflection is also reduced accordingly. It is ecpected that initial magnitude and slope reduce 
     """
-    cm_alpha = np.array([cm_alpha, cm_alpha*0.8, cm_alpha*0.4, cm_alpha*0.2, cm_alpha*0.1])
-    cm_delta = -cm_alpha/dd_dalpha
-    delta_e = np.array([flight_data.sm2_delta_e, flight_data.sm2_delta_e*0.8, flight_data.sm2_delta_e*0.4, flight_data.sm2_delta_e*0.2, flight_data.sm2_delta_e*0.1])
+    cm_alpha = np.array(
+        [cm_alpha, cm_alpha * 0.8, cm_alpha * 0.4, cm_alpha * 0.2, cm_alpha * 0.1]
+    )
+    cm_delta = -cm_alpha / dd_dalpha
+    delta_e = np.array(
+        [
+            flight_data.sm2_delta_e,
+            flight_data.sm2_delta_e * 0.8,
+            flight_data.sm2_delta_e * 0.4,
+            flight_data.sm2_delta_e * 0.2,
+            flight_data.sm2_delta_e * 0.1,
+        ]
+    )
 
     for i in range(len(cm_alpha)):
 
         plot_reduced_elevator_trim_curve(
-        flight_data.sm2_weight,
-        flight_data.sm2_alt,
-        sm2_thrust,
-        sm2_standard_thrust,
-        true_airspeed_sm2,
-        cm_delta[i],
-        delta_e[i],
-        True
+            flight_data.sm2_weight,
+            flight_data.sm2_alt,
+            sm2_thrust,
+            sm2_standard_thrust,
+            true_airspeed_sm2,
+            cm_delta[i],
+            delta_e[i],
+            True,
         )
-    
+
     plt.show()
 
     """
@@ -527,9 +534,15 @@ if __name__=="__main__":
 
     cg2 = weight.fuel_to_cg(flight_data.sm3_F_used)[0]
 
-    sm3_cg_arm1 = weight.fuel_to_cg(flight_data.sm3_F_used)[0] * flight_data.sm3_weight[0]
-    sm3_cg_arm2 = weight.fuel_to_cg(flight_data.sm3_F_used)[1] * flight_data.sm3_weight[1]
-    cg_shift = (-weight.mass_seat8 * weight.seat8 + weight.mass_seat8 * weight.seat1) * 9.81
+    sm3_cg_arm1 = (
+        weight.fuel_to_cg(flight_data.sm3_F_used)[0] * flight_data.sm3_weight[0]
+    )
+    sm3_cg_arm2 = (
+        weight.fuel_to_cg(flight_data.sm3_F_used)[1] * flight_data.sm3_weight[1]
+    )
+    cg_shift = (
+        -weight.mass_seat8 * weight.seat8 + weight.mass_seat8 * weight.seat1
+    ) * 9.81
     delta_cg = (-sm3_cg_arm1 + sm3_cg_arm2 + cg_shift) / (flight_data.sm3_weight[1])
 
     cm_alpha_new, cm_delta_new = get_cm_derivatives(
@@ -541,32 +554,50 @@ if __name__=="__main__":
         dd_dalpha,
     )
 
-    print("change in cg = ", round(cg1-cg2,3), " m")
+    print("change in cg = ", round(cg1 - cg2, 3), " m")
     print("modified cm_alpha = ", cm_alpha_new)
     print("modified cm_delta = ", cm_delta_new)
 
-    assert cm_alpha_new < cm_alpha[0], "cm_alpha is not reducing with a foward shift in cg"
+    assert (
+        cm_alpha_new < cm_alpha[0]
+    ), "cm_alpha is not reducing with a foward shift in cg"
 
     """
     Test 3:
     Assess if calculated Mach number is equal to Mach number calculated by hand (0.312) for 100 m/s CAS and 1000m height.
     """
-    np.testing.assert_almost_equal(get_mach_number(1000, 100),0.312,3, "Incorrect conversion to Mach number")
+    np.testing.assert_almost_equal(
+        get_mach_number(1000, 100), 0.312, 3, "Incorrect conversion to Mach number"
+    )
 
     """
     Test 4:
     Assess if true airspeed is equal to true airspeed calculated by hand (104.836) for 1000m height, 287.12 measured tempearture and 100 m/s CAS
     """
-    np.testing.assert_almost_equal(get_true_airspeed(1000,287.12,100), 104.836,2, "Incorrect conversion to True Airspeed")
+    np.testing.assert_almost_equal(
+        get_true_airspeed(1000, 287.12, 100),
+        104.836,
+        2,
+        "Incorrect conversion to True Airspeed",
+    )
 
     """
     Test 5:
     Assess if reduced equivalent airspeed is equal to reduced equivalent airspeed calculated by hand(776.886) with weight of 1000N, height of 1000m and 104.82622 TAS.
     """
-    np.testing.assert_almost_equal(get_reduced_equivalent_airspeed(1000, 1000, 104.82622864721496), 776.88, 2, "Incorrect conversion to reduced Equivalent Airspeed")
+    np.testing.assert_almost_equal(
+        get_reduced_equivalent_airspeed(1000, 1000, 104.82622864721496),
+        776.88,
+        2,
+        "Incorrect conversion to reduced Equivalent Airspeed",
+    )
 
     """
     Test 6:
     Assess if R^2 function will yield 1 in case of perfect fit
     """
-    np.testing.assert_almost_equal(get_r_2(np.array([1,2,3,4,5,6]), np.array([1,2,3,4,5,6])), 1, err_msg="R2 value not equal to 1 for perfect fir")
+    np.testing.assert_almost_equal(
+        get_r_2(np.array([1, 2, 3, 4, 5, 6]), np.array([1, 2, 3, 4, 5, 6])),
+        1,
+        err_msg="R2 value not equal to 1 for perfect fir",
+    )
